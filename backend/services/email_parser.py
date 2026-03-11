@@ -9,8 +9,8 @@ from pathlib import Path
 import re
 from typing import Any
 
-from backend.config import SUBJECT_REGEX
-from backend.services.text_processing import strip_html, unique_preserve_order
+from config import SUBJECT_REGEX
+from services.text_processing import strip_html, unique_preserve_order
 
 
 def fallback_subject_body(text: str) -> tuple[str, str]:

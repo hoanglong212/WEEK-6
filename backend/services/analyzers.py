@@ -7,7 +7,7 @@ import re
 from typing import Any
 from urllib.parse import urlparse
 
-from backend.config import (
+from config import (
     ASSET_URL_HOST_BLOCKLIST,
     LEADING_URL_PUNCTUATION,
     MARKETING_KEYWORDS,
@@ -24,8 +24,8 @@ from backend.config import (
     TRUSTED_OFFICIAL_DOMAINS,
     URL_REGEX,
 )
-from backend.services.email_parser import extract_domain_from_header
-from backend.services.text_processing import unique_preserve_order
+from services.email_parser import extract_domain_from_header
+from services.text_processing import unique_preserve_order
 
 
 def is_academic_domain(domain: str) -> bool:

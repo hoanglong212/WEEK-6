@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from html import unescape
 
-from backend.config import (
+from config import (
     CONTROL_CHAR_REGEX,
     EMAIL_REGEX,
     HTML_TAG_REGEX,

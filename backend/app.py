@@ -117,4 +117,4 @@ async def analyze_text(payload: AnalyzeTextRequest) -> dict[str, Any]:
 
 
 # Run:
-# uvicorn backend.app:app --reload
+# uvicorn app:app --reload

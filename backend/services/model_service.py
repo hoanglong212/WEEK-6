@@ -7,16 +7,16 @@ from typing import Any
 import joblib
 from fastapi import HTTPException
 
-from backend.config import DEFAULT_THRESHOLD, MODEL_PATH
-from backend.services.analyzers import (
+from config import DEFAULT_THRESHOLD, MODEL_PATH
+from services.analyzers import (
     analyze_attachments,
     analyze_headers,
     analyze_html_signals,
     analyze_language,
     analyze_urls,
 )
-from backend.services.scoring import build_indicators, compute_confidence, compute_risk_score, determine_verdict
-from backend.services.text_processing import clean_preview_text, clean_text
+from services.scoring import build_indicators, compute_confidence, compute_risk_score, determine_verdict
+from services.text_processing import clean_preview_text, clean_text
 
 
 def load_model_artifact() -> dict[str, Any]:

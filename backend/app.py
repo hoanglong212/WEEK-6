@@ -9,11 +9,10 @@ from typing import Any
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.config import DEFAULT_THRESHOLD, MAX_UPLOAD_BYTES
-from backend.schemas import AnalyzeTextRequest
-from backend.services.email_parser import parse_email_payload
-from backend.services.model_service import analyze_content, load_model_artifact
-
+from config import DEFAULT_THRESHOLD, MAX_UPLOAD_BYTES
+from schemas import AnalyzeTextRequest
+from services.email_parser import parse_email_payload
+from services.model_service import analyze_content, load_model_artifact
 
 @asynccontextmanager
 async def lifespan(app_instance: FastAPI):

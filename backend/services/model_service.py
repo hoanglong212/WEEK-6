@@ -7,7 +7,7 @@ from typing import Any
 import joblib
 from fastapi import HTTPException
 
-from config import DEFAULT_THRESHOLD, MODEL_PATH
+from config import DEFAULT_THRESHOLD, MODEL_FALLBACK_PATHS
 from services.analyzers import (
     analyze_attachments,
     analyze_headers,
@@ -21,16 +21,27 @@ from services.text_processing import clean_preview_text, clean_text
 
 def load_model_artifact() -> dict[str, Any]:
     """Load and validate the serialized model artifact."""
-    if not MODEL_PATH.is_file():
-        raise RuntimeError(f"Model file not found: {MODEL_PATH.resolve()}")
+    checked_paths: list[str] = []
+    resolved_model_path = None
+    for candidate in MODEL_FALLBACK_PATHS:
+        path = candidate.resolve()
+        checked_paths.append(str(path))
+        if path.is_file():
+            resolved_model_path = path
+            break
 
-    artifact = joblib.load(MODEL_PATH)
+    if resolved_model_path is None:
+        checked = "\n- ".join(checked_paths)
+        raise RuntimeError(f"Model file not found. Checked paths:\n- {checked}")
+
+    artifact = joblib.load(resolved_model_path)
     required_keys = {"vectorizer", "classifier", "label_map"}
     missing_keys = required_keys.difference(artifact.keys())
     if missing_keys:
         missing = ", ".join(sorted(missing_keys))
         raise RuntimeError(f"Invalid model artifact. Missing keys: {missing}")
 
+    artifact["model_path"] = str(resolved_model_path)
     return artifact
 
 

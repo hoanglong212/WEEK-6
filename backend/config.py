@@ -2,11 +2,46 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 import re
 
 
-MODEL_PATH = Path("spam_model.joblib")
+BACKEND_DIR = Path(__file__).resolve().parent
+REPO_ROOT_DIR = BACKEND_DIR.parent
+
+
+def _parse_bool_env(name: str, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _parse_cors_origins() -> list[str]:
+    raw = os.getenv("CORS_ALLOW_ORIGINS", "*").strip()
+    if not raw:
+        return ["*"]
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+MODEL_FILENAME = "spam_model.joblib"
+_model_env = os.getenv("MODEL_PATH", "").strip()
+if _model_env:
+    _model_env_path = Path(_model_env).expanduser()
+    MODEL_PATH = _model_env_path if _model_env_path.is_absolute() else (BACKEND_DIR / _model_env_path).resolve()
+else:
+    MODEL_PATH = BACKEND_DIR / MODEL_FILENAME
+
+MODEL_FALLBACK_PATHS: list[Path] = [BACKEND_DIR / MODEL_FILENAME, REPO_ROOT_DIR / MODEL_FILENAME]
+if MODEL_PATH not in MODEL_FALLBACK_PATHS:
+    MODEL_FALLBACK_PATHS.insert(0, MODEL_PATH)
+
+ALLOW_STARTUP_WITHOUT_MODEL = _parse_bool_env("ALLOW_STARTUP_WITHOUT_MODEL", True)
+
+CORS_ALLOW_ORIGINS = _parse_cors_origins()
+CORS_ALLOW_CREDENTIALS = _parse_bool_env("CORS_ALLOW_CREDENTIALS", False)
+
 DEFAULT_THRESHOLD = 0.5
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB
 

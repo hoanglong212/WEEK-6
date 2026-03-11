@@ -3,6 +3,3 @@ uvicorn[standard]
 python-multipart
 scikit-learn
 joblib
-pandas
-beautifulsoup4
-lxml

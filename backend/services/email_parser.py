@@ -79,7 +79,9 @@ def parse_email_payload(raw_bytes: bytes) -> dict[str, Any]:
                 disposition = part.get_content_disposition()
                 content_type = part.get_content_type()
 
-                if filename or disposition == "attachment":
+                is_inline_resource = disposition == "inline"
+                is_attachment = disposition == "attachment" or (filename and not is_inline_resource)
+                if is_attachment:
                     name = filename or "unnamed_attachment"
                     attachment_names.append(name)
                     ext = Path(name).suffix.lower()

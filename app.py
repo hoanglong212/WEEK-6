@@ -23,8 +23,11 @@ MODEL_PATH = Path("spam_model.joblib")
 DEFAULT_THRESHOLD = 0.5
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB
 
-SAFE_MAX_THRESHOLD = 30.0
-THREAT_MIN_THRESHOLD = 60.0
+HAM_MAX_THRESHOLD = 30.0
+SUSPICIOUS_MAX_THRESHOLD = 60.0
+THREAT_BASE_THRESHOLD = 82.0
+THREAT_SPAM_PROB_THRESHOLD = 0.85
+THREAT_HARD_THRESHOLD = 90.0
 
 URL_REGEX = re.compile(r"http[s]?://\S+|www\.\S+", flags=re.IGNORECASE)
 EMAIL_REGEX = re.compile(r"\b[\w\.-]+@[\w\.-]+\.\w+\b", flags=re.IGNORECASE)
@@ -314,7 +317,9 @@ def parse_email_payload(raw_bytes: bytes) -> dict[str, Any]:
                 disposition = part.get_content_disposition()
                 content_type = part.get_content_type()
 
-                if filename or disposition == "attachment":
+                is_inline_resource = disposition == "inline"
+                is_attachment = disposition == "attachment" or (filename and not is_inline_resource)
+                if is_attachment:
                     name = filename or "unnamed_attachment"
                     attachment_names.append(name)
                     ext = Path(name).suffix.lower()
@@ -635,7 +640,7 @@ def is_suspicious_url(url: str) -> bool:
         return False
 
     tld = host.split(".")[-1] if "." in host else ""
-    structural_oddity = host.count(".") >= 4 and not domain_matches_any_suffix(host, TRUSTED_OFFICIAL_DOMAINS)
+    structural_oddity = host.count(".") >= 5 and not domain_matches_any_suffix(host, TRUSTED_OFFICIAL_DOMAINS)
     checks = [
         is_ip_hostname(host),
         host.count("-") >= 4,
@@ -753,9 +758,14 @@ def analyze_language(cleaned_text: str) -> dict[str, Any]:
     transactional_hits = unique_preserve_order(transactional_phrase_hits + transactional_keyword_hits)
     has_transactional = bool(transactional_phrase_hits) or len(transactional_keyword_hits) >= 2
 
+    # Avoid over-penalizing common words like "account" in legitimate transactional emails.
+    has_phishing = len(phishing_hits) >= 2
+
     flags: list[str] = []
-    if phishing_hits:
+    if has_phishing:
         flags.append("Phishing-like language detected.")
+    elif phishing_hits:
+        flags.append("Low-confidence phishing terms detected.")
     else:
         flags.append("No strong phishing keywords detected.")
     if marketing_hits:
@@ -767,7 +777,7 @@ def analyze_language(cleaned_text: str) -> dict[str, Any]:
         "phishing_hits": phishing_hits,
         "marketing_hits": marketing_hits,
         "transactional_hits": transactional_hits,
-        "has_phishing": bool(phishing_hits),
+        "has_phishing": has_phishing,
         "has_marketing": bool(marketing_hits),
         "has_transactional": has_transactional,
         "language_flags": unique_preserve_order(flags),
@@ -814,29 +824,29 @@ def compute_risk_score(
     """Compute transparent rule-based risk score in range [0, 100]."""
     score = 0.0
 
-    score += spam_probability * 36.0
+    score += spam_probability * 30.0
     if spam_probability >= max(threshold, 0.65):
-        score += 6.0
+        score += 4.0
 
     if header_analysis["reply_mismatch"]:
-        score += 15.0
-    if header_analysis["return_path_mismatch"]:
-        score += 5.0
-    if header_analysis["header_context_present"] and header_analysis["missing_sender_domain"]:
         score += 8.0
+    if header_analysis["return_path_mismatch"]:
+        score += 3.0
+    if header_analysis["header_context_present"] and header_analysis["missing_sender_domain"]:
+        score += 6.0
 
     suspicious_url_count = len(url_analysis["suspicious_urls"])
     if suspicious_url_count:
-        score += 9.0 + min(9.0, suspicious_url_count * 2.5)
+        score += 7.0 + min(8.0, suspicious_url_count * 2.0)
     if url_analysis["url_count"] >= 4:
         score += 2.0
     if url_analysis["url_count"] >= 8:
         score += 2.0
     if url_analysis["tracking_detected"]:
-        score += 2.0
+        score += 0.5
 
     if language_analysis["has_phishing"]:
-        score += 12.0
+        score += 8.0
 
     if attachment_analysis["has_risky_exec"]:
         score += 15.0
@@ -846,7 +856,7 @@ def compute_risk_score(
         score += 12.0
 
     if html_analysis["html_flags"] and language_analysis["has_phishing"]:
-        score += 2.0
+        score += 1.0
 
     no_suspicious_urls = suspicious_url_count == 0
     no_risky_attachments = not (
@@ -879,20 +889,26 @@ def compute_risk_score(
     return clamp(score, 0.0, 100.0)
 
 
-def determine_verdict(risk_score: float, _spam_probability: float) -> str:
+def determine_verdict(risk_score: float, spam_probability: float) -> str:
     """Final verdict from hybrid risk score."""
-    if risk_score < SAFE_MAX_THRESHOLD:
-        return "SAFE"
-    if risk_score < THREAT_MIN_THRESHOLD:
+    if risk_score >= THREAT_HARD_THRESHOLD:
+        return "THREAT"
+    if risk_score >= THREAT_BASE_THRESHOLD and spam_probability >= THREAT_SPAM_PROB_THRESHOLD:
+        return "THREAT"
+    if risk_score >= SUSPICIOUS_MAX_THRESHOLD or spam_probability >= 0.8:
+        return "SPAM"
+    if risk_score >= HAM_MAX_THRESHOLD or spam_probability >= 0.5:
         return "SUSPICIOUS"
-    return "THREAT"
+    return "HAM"
 
 
 def compute_confidence(verdict: str, spam_probability: float, risk_score: float) -> float:
     """Confidence heuristic for UI display."""
     if verdict == "THREAT":
-        confidence = 0.65 * (risk_score / 100.0) + 0.35 * spam_probability
-    elif verdict == "SAFE":
+        confidence = 0.72 * (risk_score / 100.0) + 0.28 * spam_probability
+    elif verdict == "SPAM":
+        confidence = 0.65 * spam_probability + 0.35 * (risk_score / 100.0)
+    elif verdict == "HAM":
         confidence = 0.65 * ((100.0 - risk_score) / 100.0) + 0.35 * (1.0 - spam_probability)
     else:
         distance = min(abs(risk_score - 45.0) / 15.0, 1.0)
@@ -941,11 +957,13 @@ def build_indicators(
 
     indicators.append(f"Hybrid risk score: {risk_score:.1f}/100.")
     if verdict == "THREAT":
-        indicators.append("Final verdict: THREAT (high combined risk).")
+        indicators.append("Final verdict: THREAT (high confidence malicious signals).")
+    elif verdict == "SPAM":
+        indicators.append("Final verdict: SPAM (high combined spam risk).")
     elif verdict == "SUSPICIOUS":
         indicators.append("Final verdict: SUSPICIOUS (manual review recommended).")
     else:
-        indicators.append("Final verdict: SAFE (low combined risk).")
+        indicators.append("Final verdict: HAM (low combined risk).")
 
     return unique_preserve_order(indicators)
 

@@ -147,7 +147,7 @@ def is_suspicious_url(url: str) -> bool:
         return False
 
     tld = host.split(".")[-1] if "." in host else ""
-    structural_oddity = host.count(".") >= 4 and not any(
+    structural_oddity = host.count(".") >= 5 and not any(
         domain_matches_suffix(host, suffix) for suffix in TRUSTED_OFFICIAL_DOMAINS
     )
     checks = [
@@ -245,9 +245,14 @@ def analyze_language(cleaned_text: str) -> dict[str, Any]:
     transactional_hits = unique_preserve_order(transactional_phrase_hits + transactional_keyword_hits)
     has_transactional = bool(transactional_phrase_hits) or len(transactional_keyword_hits) >= 2
 
+    # Avoid over-penalizing common words like "account" in legitimate transactional emails.
+    has_phishing = len(phishing_hits) >= 2
+
     flags: list[str] = []
-    if phishing_hits:
+    if has_phishing:
         flags.append("Phishing-like language detected.")
+    elif phishing_hits:
+        flags.append("Low-confidence phishing terms detected.")
     else:
         flags.append("No strong phishing keywords detected.")
     if marketing_hits:
@@ -259,7 +264,7 @@ def analyze_language(cleaned_text: str) -> dict[str, Any]:
         "phishing_hits": phishing_hits,
         "marketing_hits": marketing_hits,
         "transactional_hits": transactional_hits,
-        "has_phishing": bool(phishing_hits),
+        "has_phishing": has_phishing,
         "has_marketing": bool(marketing_hits),
         "has_transactional": has_transactional,
         "language_flags": unique_preserve_order(flags),

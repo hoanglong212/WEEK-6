@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+﻿import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 
-/* ═══════════════════════════════════════════════════════════════
-   GLOBAL STYLES — merged both apps
-═══════════════════════════════════════════════════════════════ */
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   GLOBAL STYLES â€” merged both apps
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const GlobalStyles = () => {
   useEffect(() => {
     const link = document.createElement("link");
@@ -76,9 +78,9 @@ const GlobalStyles = () => {
   return null;
 };
 
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    AURORA BACKGROUND (full hex grid + particles)
-═══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const AuroraBackground = ({ mx, my }) => {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
@@ -116,9 +118,9 @@ const AuroraBlobs = () => (
   </div>
 );
 
-/* ═══════════════════════════════════════════════════════════════
-   THREAT RADAR — working ping wave sonar
-═══════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   THREAT RADAR â€” working ping wave sonar
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ThreatRadar = ({ mx, my }) => {
   const canvasRef = useRef(null);
   const rafRef    = useRef(null);
@@ -227,13 +229,13 @@ const ThreatRadar = ({ mx, my }) => {
       [R+4,R+10,R+22].forEach((r2,i)=>{ctx.beginPath();ctx.arc(CX,CY,r2,0,Math.PI*2);ctx.strokeStyle=GD([0.38,0.14,0.05][i]);ctx.lineWidth=[1.8,1,.5][i];if(i===0){ctx.shadowColor="#00FF41";ctx.shadowBlur=16;}ctx.stroke();ctx.shadowBlur=0;});
       for(let i=0;i<72;i++){const a=(i/72)*Math.PI*2,maj=i%6===0,med=i%3===0,inner=maj?R+4:med?R+6:R+8;const x1=CX+Math.cos(a)*inner,y1=CY+Math.sin(a)*inner,x2=CX+Math.cos(a)*(R+16),y2=CY+Math.sin(a)*(R+16);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=GD(maj?.7:med?.35:.15);ctx.lineWidth=maj?1.5:med?.9:.5;ctx.stroke();}
       ctx.font="bold 10px 'JetBrains Mono',monospace"; ctx.textAlign="center";
-      [[0,"000"],[Math.PI/2,"090"],[Math.PI,"180"],[Math.PI*1.5,"270"]].forEach(([a,l])=>{const lx2=CX+Math.cos(a)*(R+28),ly2=CY+Math.sin(a)*(R+28)+3.5;ctx.fillStyle=GD(.6);ctx.fillText(l+"°",lx2,ly2);});
+      [[0,"000"],[Math.PI/2,"090"],[Math.PI,"180"],[Math.PI*1.5,"270"]].forEach(([a,l])=>{const lx2=CX+Math.cos(a)*(R+28),ly2=CY+Math.sin(a)*(R+28)+3.5;ctx.fillStyle=GD(.6);ctx.fillText(l+"Â°",lx2,ly2);});
       ctx.save();ctx.font="bold 8px 'JetBrains Mono',monospace";ctx.fillStyle=GD(.5);ctx.textAlign="center";
-      const arcLabel="◆  ACTIVE THREAT DETECTION SYSTEM  ◆",arcR=R+38,arcSpan=Math.PI*.72;
+      const arcLabel="â—†  ACTIVE THREAT DETECTION SYSTEM  â—†",arcR=R+38,arcSpan=Math.PI*.72;
       for(let ci=0;ci<arcLabel.length;ci++){const t2=ci/(arcLabel.length-1),charA=-Math.PI/2-arcSpan/2+t2*arcSpan;ctx.save();ctx.translate(CX+Math.cos(charA)*arcR,CY+Math.sin(charA)*arcR);ctx.rotate(charA+Math.PI/2);ctx.fillText(arcLabel[ci],0,0);ctx.restore();}
       ctx.restore();
       ctx.save();ctx.font="8px 'JetBrains Mono',monospace";ctx.fillStyle=GD(.35);ctx.textAlign="center";
-      const botLabel="◇  EMAIL THREAT ANALYZER v2.0  ◇",botR=R+38,botSpan=Math.PI*.6;
+      const botLabel="â—‡  EMAIL THREAT ANALYZER v2.0  â—‡",botR=R+38,botSpan=Math.PI*.6;
       for(let ci=0;ci<botLabel.length;ci++){const t2=ci/(botLabel.length-1),charA=Math.PI/2-botSpan/2+t2*botSpan;ctx.save();ctx.translate(CX+Math.cos(charA)*botR,CY+Math.sin(charA)*botR);ctx.rotate(charA-Math.PI/2);ctx.fillText(botLabel[ci],0,0);ctx.restore();}
       ctx.restore();
       const found=THREATS.filter(t=>t.visible);
@@ -273,16 +275,16 @@ const ThreatRadar = ({ mx, my }) => {
   );
 };
 
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SHARED SMALL COMPONENTS
-═══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const ScanLine = () => (
   <div style={{position:"fixed",left:0,right:0,height:2,zIndex:200,pointerEvents:"none",background:"linear-gradient(90deg,transparent 0%,rgba(0,229,255,.08) 15%,rgba(0,229,255,.9) 50%,rgba(0,229,255,.08) 85%,transparent 100%)",boxShadow:"0 0 20px rgba(0,229,255,.6),0 0 60px rgba(0,229,255,.3)",animation:"scan-v 2.6s linear infinite"}} />
 );
 const TypeWriter = ({texts}) => {
   const [i,setI]=useState(0),[disp,setDisp]=useState(""),[ci,setCi]=useState(0);
   useEffect(()=>{const cur=texts[i%texts.length];if(ci<cur.length){const t=setTimeout(()=>{setDisp(cur.slice(0,ci+1));setCi(c=>c+1);},36);return()=>clearTimeout(t);}const t=setTimeout(()=>{setI(x=>x+1);setCi(0);setDisp("");},1100);return()=>clearTimeout(t);},[ci,i]);
-  return <span className="f-mono" style={{color:"#00E5FF",fontSize:12,letterSpacing:.8}}>{disp}<span style={{animation:"blink 1s step-end infinite",color:"#00FFA3"}}>▌</span></span>;
+  return <span className="f-mono" style={{color:"#00E5FF",fontSize:12,letterSpacing:.8}}>{disp}<span style={{animation:"blink 1s step-end infinite",color:"#00FFA3"}}>â–Œ</span></span>;
 };
 const AnimNum = ({to, suffix=""}) => {
   const [v,setV]=useState(0);
@@ -299,25 +301,172 @@ const Panel = ({title,icon,color="#00E5FF",children,delay=0}) => {
   return (<motion.div initial={{opacity:0,x:-20}} animate={{opacity:1,x:0}} transition={{delay}} className="glass-card grad-border" style={{marginBottom:10,overflow:"hidden"}}><button onClick={()=>setOpen(o=>!o)} style={{width:"100%",padding:"16px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"none",border:"none",cursor:"pointer"}}><div style={{display:"flex",alignItems:"center",gap:14}}><div style={{width:32,height:32,borderRadius:8,background:`linear-gradient(135deg,${color}18,${color}06)`,border:`1px solid ${color}30`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>{icon}</div><span className="f-orb" style={{color:"#A8C0D8",fontSize:10,letterSpacing:2.5}}>{title}</span></div><motion.div animate={{rotate:open?180:0}} transition={{duration:.25}} style={{width:24,height:24,borderRadius:6,background:`${color}12`,border:`1px solid ${color}25`,display:"flex",alignItems:"center",justifyContent:"center",color}}><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M5 7L1 3h8z"/></svg></motion.div></button><AnimatePresence>{open&&(<motion.div initial={{height:0,opacity:0}} animate={{height:"auto",opacity:1}} exit={{height:0,opacity:0}} transition={{duration:.3,ease:[.4,0,.2,1]}}><div style={{padding:"4px 20px 20px",borderTop:`1px solid ${color}12`}}>{children}</div></motion.div>)}</AnimatePresence></motion.div>);
 };
 const Tag = ({label,color,delay=0}) => (<motion.div className="threat-tag" initial={{opacity:0,scale:.7,y:8}} animate={{opacity:1,scale:1,y:0}} transition={{delay,type:"spring",stiffness:240,damping:16}} style={{color,background:`${color}0D`,border:`1px solid ${color}38`,boxShadow:`0 0 12px ${color}18`}}><div style={{width:5,height:5,borderRadius:"50%",background:color,boxShadow:`0 0 6px ${color}`,animation:"pulse-ring 2s ease-in-out infinite"}}/>{label}</motion.div>);
-const Verdict = ({v}) => {const map={HAM:{c:"#00FFA3",label:"SAFE",sub:"No threats detected"},SUSPICIOUS:{c:"#FFD60A",label:"SUSPICIOUS",sub:"Manual review advised"},SPAM:{c:"#FF4D6D",label:"THREAT",sub:"Malicious email confirmed"}};const{c,label,sub}=map[v]||map.SUSPICIOUS;return(<motion.div initial={{scale:.5,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:"spring",stiffness:160,damping:12}} style={{padding:"20px 28px",borderRadius:14,background:`linear-gradient(135deg,${c}08 0%,rgba(0,0,0,.5) 100%)`,border:`1px solid ${c}40`,textAlign:"center",boxShadow:`0 0 40px ${c}18,0 0 80px ${c}08`}}><div className="f-mono" style={{fontSize:9,color:`${c}88`,letterSpacing:4,marginBottom:8}}>VERDICT</div><div className="f-orb" style={{fontSize:26,fontWeight:900,color:c,letterSpacing:2,textShadow:`0 0 30px ${c}99`}}>{label}</div><div className="f-mono" style={{fontSize:10,color:`${c}66`,marginTop:6,letterSpacing:.5}}>{sub}</div></motion.div>);};
+const Verdict = ({ v }) => {
+  const map = {
+    HAM: { c: "#00FFA3", label: "LEGITIMATE", sub: "No threats detected" },
+    SUSPICIOUS: { c: "#FFD60A", label: "SUSPICIOUS", sub: "Manual review advised" },
+    SPAM: { c: "#FF9F1A", label: "SPAM", sub: "Likely unsolicited or deceptive content" },
+    THREAT: { c: "#FF4D6D", label: "THREAT", sub: "Malicious email confirmed" },
+  };
+  const key = (v || "").toUpperCase();
+  const { c, label, sub } = map[key] || map.SUSPICIOUS;
+  return (
+    <motion.div
+      initial={{ scale: 0.5, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 160, damping: 12 }}
+      style={{
+        padding: "20px 28px",
+        borderRadius: 14,
+        background: `linear-gradient(135deg,${c}08 0%,rgba(0,0,0,.5) 100%)`,
+        border: `1px solid ${c}40`,
+        textAlign: "center",
+        boxShadow: `0 0 40px ${c}18,0 0 80px ${c}08`,
+      }}
+    >
+      <div className="f-mono" style={{ fontSize: 9, color: `${c}88`, letterSpacing: 4, marginBottom: 8 }}>
+        VERDICT
+      </div>
+      <div
+        className="f-orb"
+        style={{ fontSize: 26, fontWeight: 900, color: c, letterSpacing: 2, textShadow: `0 0 30px ${c}99` }}
+      >
+        {label}
+      </div>
+      <div className="f-mono" style={{ fontSize: 10, color: `${c}66`, marginTop: 6, letterSpacing: 0.5 }}>
+        {sub}
+      </div>
+    </motion.div>
+  );
+};
 const BarStat = ({label,val,color,delay=0}) => (<motion.div initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} transition={{delay}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:7}}><span className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.6)",letterSpacing:1.5}}>{label}</span><span className="f-mono" style={{fontSize:12,color,fontWeight:500}}><AnimNum to={val} suffix="%"/></span></div><div style={{height:5,background:"rgba(255,255,255,.04)",borderRadius:99,overflow:"hidden",position:"relative"}}><motion.div initial={{width:0}} animate={{width:`${val}%`}} transition={{duration:1.5,delay:delay+.2,ease:"easeOut"}} style={{height:"100%",background:`linear-gradient(90deg,${color}60,${color})`,borderRadius:99,boxShadow:`0 0 10px ${color}`}}/></div></motion.div>);
 const ScanAnim = () => (<motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:20,padding:"32px 0"}}><div style={{position:"relative",width:88,height:88}}><div style={{position:"absolute",inset:0,borderRadius:"50%",border:"2px solid rgba(0,229,255,.15)",borderTopColor:"#00E5FF",animation:"spin 1s linear infinite"}}/><div style={{position:"absolute",inset:10,borderRadius:"50%",border:"1.5px solid rgba(0,255,163,.12)",borderBottomColor:"#00FFA3",animation:"cspin 1.6s linear infinite"}}/><div style={{position:"absolute",inset:20,borderRadius:"50%",border:"1px solid rgba(124,58,237,.15)",borderLeftColor:"#7C3AED",animation:"spin 2.2s linear infinite"}}/><div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:14,height:14,borderRadius:"50%",background:"#00E5FF",boxShadow:"0 0 20px #00E5FF,0 0 40px #00E5FF66",animation:"pulse-ring 1.2s ease-in-out infinite"}}/></div></div><TypeWriter texts={["Parsing MIME structure...","Resolving sender domain...","Extracting anchor tags...","Analyzing language entropy...","Checking URL reputation...","Computing threat vectors...","Generating AI verdict..."]}/><div style={{display:"flex",gap:6,alignItems:"center"}}>{[0,1,2,3,4,5].map(i=>(<motion.div key={i} style={{width:3,height:3,borderRadius:"50%",background:"#00E5FF"}} animate={{opacity:[.15,1,.15],scaleY:[.8,1.6,.8]}} transition={{duration:1,delay:i*.1,repeat:Infinity}}/>))}</div></motion.div>);
 
 const DataTicker = () => {
-  const items="THREAT DB UPDATED 03:24:11 UTC  ◆  247,832 PHISHING DOMAINS TRACKED  ◆  AI MODEL v2.4.1  ◆  LATENCY 12ms  ◆  UPTIME 99.98%  ◆  NEW VECTOR: BEC CAMPAIGN DETECTED  ◆  LAST SCAN: 0.3s AGO  ◆  ";
+  const items="THREAT DB UPDATED 03:24:11 UTC  â—†  247,832 PHISHING DOMAINS TRACKED  â—†  AI MODEL v2.4.1  â—†  LATENCY 12ms  â—†  UPTIME 99.98%  â—†  NEW VECTOR: BEC CAMPAIGN DETECTED  â—†  LAST SCAN: 0.3s AGO  â—†  ";
   return (<div style={{borderTop:"1px solid rgba(0,229,255,.08)",borderBottom:"1px solid rgba(0,229,255,.08)",background:"rgba(0,229,255,.02)",padding:"7px 0",overflow:"hidden",position:"relative",zIndex:5}}><div style={{position:"absolute",left:0,top:0,bottom:0,width:60,background:"linear-gradient(to right,#020812,transparent)",zIndex:2}}/><div style={{position:"absolute",right:0,top:0,bottom:0,width:60,background:"linear-gradient(to left,#020812,transparent)",zIndex:2}}/><div className="ticker-content f-mono" style={{color:"rgba(0,229,255,.35)",fontSize:10,letterSpacing:1.5}}>{items+items}</div></div>);
 };
 
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DEMO DATA
-═══════════════════════════════════════════════════════════════ */
-const D={verdict:"SPAM",confidence:94,spamProb:89,riskScore:82,threats:["HTML Email Body","Spoofed Sender Domain","Phishing Language Patterns","Suspicious Reply-To Header","Obfuscated URLs Detected","Urgency + Fear Signals","Double Extension Attachment","Mismatched Anchor Text"],headers:{from:"noreply@secure-bank-alerts.xyz",replyTo:"support@gmail-phish.net",spf:"FAIL",dkim:"NONE",dmarc:"FAIL",domain:"MISMATCH"},urls:[{url:"https://secure-bank-alerts.xyz/verify-account-now",sus:true,type:"Phishing"},{url:"https://bit.ly/3xK9mQ7fP",sus:true,type:"URL Shortener"},{url:"https://track.mailgun-phish.net/click",sus:true,type:"Tracking"},{url:"https://www.google.com/",sus:false,type:"Benign"}],attach:[{name:"Invoice_2024.pdf.exe",ext:".exe",danger:true},{name:"Statement.doc.zip",ext:".zip",danger:true}],kw:["urgent action required","verify your account immediately","click the link below","your account has been suspended","limited time — act now","confirm your identity"],stats:{links:4,html:true,attach:2,phishKw:6}};
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+const EMPTY_ANALYSIS = {
+  verdict: "HAM",
+  confidence: 0,
+  spamProb: 0,
+  riskScore: 0,
+  threats: [],
+  headers: {
+    from: "N/A",
+    replyTo: "N/A",
+    returnPath: "N/A",
+    spf: "N/A",
+    dkim: "N/A",
+    dmarc: "N/A",
+    domain: "N/A",
+  },
+  urls: [],
+  attach: [],
+  kw: [],
+  stats: { links: 0, html: false, attach: 0, phishKw: 0 },
+};
 
-/* ═══════════════════════════════════════════════════════════════
+const normalizeVerdict = (verdict) => {
+  const key = String(verdict || "").trim().toUpperCase();
+  if (!key) return "SUSPICIOUS";
+  if (["HAM", "SAFE", "LEGITIMATE", "LEGIT"].includes(key)) return "HAM";
+  if (["SUSPICIOUS", "REVIEW"].includes(key)) return "SUSPICIOUS";
+  if (["SPAM"].includes(key)) return "SPAM";
+  if (["THREAT", "MALICIOUS"].includes(key)) return "THREAT";
+  return "SUSPICIOUS";
+};
+
+const toPercent = (value) => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  if (n <= 1) return Math.max(0, Math.min(100, Math.round(n * 100)));
+  return Math.max(0, Math.min(100, Math.round(n)));
+};
+
+const urlKey = (url) => String(url || "").trim().toLowerCase().replace(/\/+$/, "");
+
+const deriveAttachmentExt = (filename) => {
+  const m = String(filename || "").match(/(\.[a-z0-9]{1,8})$/i);
+  return m ? m[1].toLowerCase() : "";
+};
+
+const classifyHeaderDomain = (headerFlags) => {
+  const hasMismatch = headerFlags.some((f) => /differs from sender domain/i.test(f));
+  return hasMismatch ? "MISMATCH" : "ALIGNED";
+};
+
+const mapApiResponseToView = (payload) => {
+  const headerFlags = Array.isArray(payload?.header_flags) ? payload.header_flags : [];
+  const urlFlags = Array.isArray(payload?.url_flags) ? payload.url_flags : [];
+  const attachmentFlags = Array.isArray(payload?.attachment_flags) ? payload.attachment_flags : [];
+  const languageFlags = Array.isArray(payload?.language_flags) ? payload.language_flags : [];
+  const htmlFlags = Array.isArray(payload?.html_flags) ? payload.html_flags : [];
+  const indicators = Array.isArray(payload?.indicators) ? payload.indicators : [];
+
+  const extractedUrls = Array.isArray(payload?.extracted_urls) ? payload.extracted_urls : [];
+  const suspiciousUrls = new Set(
+    (Array.isArray(payload?.suspicious_urls) ? payload.suspicious_urls : []).map((u) => urlKey(u)),
+  );
+  const trackingUrls = new Set(
+    (Array.isArray(payload?.tracking_urls) ? payload.tracking_urls : []).map((u) => urlKey(u)),
+  );
+
+  const attachmentNames = Array.isArray(payload?.attachment_names) ? payload.attachment_names : [];
+
+  const threatSignals = indicators.length
+    ? indicators.filter((x) => typeof x === "string" && x.trim()).slice(0, 8)
+    : [...headerFlags, ...urlFlags, ...attachmentFlags, ...languageFlags].slice(0, 8);
+
+  return {
+    verdict: normalizeVerdict(payload?.verdict),
+    confidence: toPercent(payload?.confidence),
+    spamProb: toPercent(payload?.spam_probability),
+    riskScore: toPercent(payload?.risk_score),
+    threats: threatSignals,
+    headers: {
+      from: payload?.sender || "N/A",
+      replyTo: payload?.reply_to || "N/A",
+      returnPath: payload?.return_path || "N/A",
+      spf: "N/A",
+      dkim: "N/A",
+      dmarc: "N/A",
+      domain: classifyHeaderDomain(headerFlags),
+    },
+    urls: extractedUrls.map((url) => {
+      const key = urlKey(url);
+      const suspicious = suspiciousUrls.has(key);
+      const tracking = trackingUrls.has(key);
+      return {
+        url,
+        sus: suspicious,
+        type: suspicious ? "Suspicious" : tracking ? "Tracking" : "Link",
+      };
+    }),
+    attach: attachmentNames.map((name) => {
+      const ext = deriveAttachmentExt(name);
+      const danger = [".exe", ".js", ".scr", ".bat", ".cmd", ".ps1", ".vbs", ".docm", ".xlsm"].includes(ext);
+      return { name, ext, danger };
+    }),
+    kw: languageFlags,
+    stats: {
+      links: Number(payload?.url_count || extractedUrls.length || 0),
+      html: Boolean(payload?.has_html || htmlFlags.length),
+      attach: Number(payload?.attachment_count || attachmentNames.length || 0),
+      phishKw: languageFlags.filter((x) => /phishing/i.test(x)).length,
+    },
+  };
+};
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    LANDING PAGE COMPONENTS
-═══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const LandingTicker = () => {
-  const items=["⬡ 2.4B THREATS BLOCKED TODAY","◈ 99.97% DETECTION RATE","◆ <0.3ms SCAN LATENCY","⬡ 140+ THREAT VECTORS","◈ SOC2 TYPE II CERTIFIED","◆ ZERO TRUST ARCHITECTURE","⬡ AI-POWERED ENGINE","◈ REAL-TIME INTELLIGENCE","◆ 50M+ EMAILS SCANNED","⬡ ENTERPRISE GRADE"];
+  const items=["â¬¡ 2.4B THREATS BLOCKED TODAY","â—ˆ 99.97% DETECTION RATE","â—† <0.3ms SCAN LATENCY","â¬¡ 140+ THREAT VECTORS","â—ˆ SOC2 TYPE II CERTIFIED","â—† ZERO TRUST ARCHITECTURE","â¬¡ AI-POWERED ENGINE","â—ˆ REAL-TIME INTELLIGENCE","â—† 50M+ EMAILS SCANNED","â¬¡ ENTERPRISE GRADE"];
   const str=items.join("    ");
   return (<div style={{overflow:"hidden",borderTop:"1px solid rgba(0,255,65,.1)",borderBottom:"1px solid rgba(0,255,65,.1)",background:"rgba(0,255,65,.02)",padding:"10px 0",position:"relative",zIndex:10}}><div style={{display:"flex",whiteSpace:"nowrap",animation:"ticker 40s linear infinite"}}>{[str,str].map((s,i)=>(<span key={i} className="f-mono" style={{color:"rgba(0,255,65,.5)",fontSize:10,letterSpacing:2,paddingRight:40}}>{s}</span>))}</div></div>);
 };
@@ -334,10 +483,10 @@ const FeatureCard = ({icon,title,desc,color="#00FF41",delay=0}) => {
 };
 const PricingCard = ({tier,price,period="/mo",features,highlight=false,delay=0,onStart}) => {
   const [hov,setHov]=useState(false);
-  return (<motion.div initial={{opacity:0,y:30}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:.6,delay}} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={{padding:"36px 28px",borderRadius:8,cursor:"none",position:"relative",background:highlight?"rgba(0,255,65,.06)":"rgba(0,20,8,.6)",border:highlight?"1px solid rgba(0,255,65,.35)":"1px solid rgba(0,255,65,.1)",boxShadow:highlight?"0 0 60px rgba(0,255,65,.1),inset 0 0 40px rgba(0,255,65,.03)":"none",transform:(highlight||hov)?"translateY(-6px)":"translateY(0)",transition:"all .35s ease"}}>{highlight&&<div className="f-mono" style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#00FF41",color:"#020812",padding:"4px 16px",borderRadius:99,fontSize:9,fontWeight:700,letterSpacing:2}}>MOST POPULAR</div>}<div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,textTransform:"uppercase",marginBottom:8}}>{tier}</div><div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:24}}><span className="f-orb" style={{fontSize:42,fontWeight:900,color:highlight?"#00FF41":"#C8DCEE"}}>${price}</span><span className="f-mono" style={{color:"rgba(200,220,238,.4)",fontSize:12}}>{period}</span></div><div style={{borderTop:"1px solid rgba(0,255,65,.1)",paddingTop:24,display:"flex",flexDirection:"column",gap:14}}>{features.map((f,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:10}}><span style={{color:"#00FF41",fontSize:10}}>◆</span><span className="f-mono" style={{color:"rgba(200,220,238,.7)",fontSize:12}}>{f}</span></div>))}</div><button className="f-orb" onClick={onStart} style={{width:"100%",marginTop:28,padding:"12px",borderRadius:4,fontSize:11,fontWeight:700,letterSpacing:2,cursor:"none",background:highlight?"rgba(0,255,65,.15)":"transparent",border:highlight?"1px solid rgba(0,255,65,.5)":"1px solid rgba(0,255,65,.2)",color:highlight?"#00FF41":"rgba(0,255,65,.6)",transition:"all .25s"}} onMouseEnter={e=>{e.target.style.background="rgba(0,255,65,.25)";e.target.style.boxShadow="0 0 20px rgba(0,255,65,.15)";}} onMouseLeave={e=>{e.target.style.background=highlight?"rgba(0,255,65,.15)":"transparent";e.target.style.boxShadow="none";}}>GET STARTED</button></motion.div>);
+  return (<motion.div initial={{opacity:0,y:30}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:.6,delay}} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} style={{padding:"36px 28px",borderRadius:8,cursor:"none",position:"relative",background:highlight?"rgba(0,255,65,.06)":"rgba(0,20,8,.6)",border:highlight?"1px solid rgba(0,255,65,.35)":"1px solid rgba(0,255,65,.1)",boxShadow:highlight?"0 0 60px rgba(0,255,65,.1),inset 0 0 40px rgba(0,255,65,.03)":"none",transform:(highlight||hov)?"translateY(-6px)":"translateY(0)",transition:"all .35s ease"}}>{highlight&&<div className="f-mono" style={{position:"absolute",top:-12,left:"50%",transform:"translateX(-50%)",background:"#00FF41",color:"#020812",padding:"4px 16px",borderRadius:99,fontSize:9,fontWeight:700,letterSpacing:2}}>MOST POPULAR</div>}<div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,textTransform:"uppercase",marginBottom:8}}>{tier}</div><div style={{display:"flex",alignItems:"baseline",gap:4,marginBottom:24}}><span className="f-orb" style={{fontSize:42,fontWeight:900,color:highlight?"#00FF41":"#C8DCEE"}}>${price}</span><span className="f-mono" style={{color:"rgba(200,220,238,.4)",fontSize:12}}>{period}</span></div><div style={{borderTop:"1px solid rgba(0,255,65,.1)",paddingTop:24,display:"flex",flexDirection:"column",gap:14}}>{features.map((f,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:10}}><span style={{color:"#00FF41",fontSize:10}}>â—†</span><span className="f-mono" style={{color:"rgba(200,220,238,.7)",fontSize:12}}>{f}</span></div>))}</div><button className="f-orb" onClick={onStart} style={{width:"100%",marginTop:28,padding:"12px",borderRadius:4,fontSize:11,fontWeight:700,letterSpacing:2,cursor:"none",background:highlight?"rgba(0,255,65,.15)":"transparent",border:highlight?"1px solid rgba(0,255,65,.5)":"1px solid rgba(0,255,65,.2)",color:highlight?"#00FF41":"rgba(0,255,65,.6)",transition:"all .25s"}} onMouseEnter={e=>{e.target.style.background="rgba(0,255,65,.25)";e.target.style.boxShadow="0 0 20px rgba(0,255,65,.15)";}} onMouseLeave={e=>{e.target.style.background=highlight?"rgba(0,255,65,.15)":"transparent";e.target.style.boxShadow="none";}}>GET STARTED</button></motion.div>);
 };
 const Step=({num,title,desc,delay=0})=>(<motion.div initial={{opacity:0,x:-20}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:.6,delay}} style={{display:"flex",gap:24,alignItems:"flex-start"}}><div style={{flexShrink:0,width:52,height:52,borderRadius:"50%",border:"1px solid rgba(0,255,65,.3)",display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,255,65,.06)"}}><span className="f-orb" style={{color:"#00FF41",fontSize:16,fontWeight:700}}>{num}</span></div><div><div className="f-orb" style={{color:"#00FF41",fontSize:13,fontWeight:600,letterSpacing:1,marginBottom:8}}>{title}</div><div style={{color:"rgba(200,220,238,.6)",fontSize:14,lineHeight:1.7}}>{desc}</div></div></motion.div>);
-const Testimonial=({quote,name,role,company,delay=0})=>(<motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:.6,delay}} className="glass-lp" style={{padding:"28px",borderRadius:8}}><div style={{color:"rgba(0,255,65,.4)",fontSize:32,lineHeight:1,marginBottom:16,fontFamily:"serif"}}>"</div><div style={{color:"rgba(200,220,238,.8)",fontSize:14,lineHeight:1.75,marginBottom:20}}>{quote}</div><div style={{borderTop:"1px solid rgba(0,255,65,.1)",paddingTop:16}}><div className="f-orb" style={{color:"#00FF41",fontSize:12,fontWeight:600}}>{name}</div><div className="f-mono" style={{color:"rgba(200,220,238,.4)",fontSize:10,letterSpacing:1,marginTop:2}}>{role} · {company}</div></div></motion.div>);
+const Testimonial=({quote,name,role,company,delay=0})=>(<motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:.6,delay}} className="glass-lp" style={{padding:"28px",borderRadius:8}}><div style={{color:"rgba(0,255,65,.4)",fontSize:32,lineHeight:1,marginBottom:16,fontFamily:"serif"}}>"</div><div style={{color:"rgba(200,220,238,.8)",fontSize:14,lineHeight:1.75,marginBottom:20}}>{quote}</div><div style={{borderTop:"1px solid rgba(0,255,65,.1)",paddingTop:16}}><div className="f-orb" style={{color:"#00FF41",fontSize:12,fontWeight:600}}>{name}</div><div className="f-mono" style={{color:"rgba(200,220,238,.4)",fontSize:10,letterSpacing:1,marginTop:2}}>{role} Â· {company}</div></div></motion.div>);
 
 const MiniRadar = () => {
   const ref=useRef(null),raf=useRef(null);
@@ -345,9 +494,9 @@ const MiniRadar = () => {
   return <canvas ref={ref} style={{display:"block"}}/>;
 };
 
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    UNIFIED NAV
-═══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const Nav = ({page, setPage, scrollY}) => {
   const scrolled = scrollY > 60;
   const isApp = page === "app";
@@ -362,7 +511,7 @@ const Nav = ({page, setPage, scrollY}) => {
       </div>
       <div style={{display:"flex",gap:8,alignItems:"center"}}>
         {isApp ? (
-          <button onClick={()=>setPage("landing")} className="f-mono" style={{background:"transparent",border:"1px solid rgba(0,255,65,.3)",color:"rgba(0,255,65,.7)",padding:"8px 18px",borderRadius:4,fontSize:11,letterSpacing:1,cursor:"none",display:"flex",alignItems:"center",gap:8,transition:"all .2s"}} onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(0,255,65,.7)"} onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(0,255,65,.3)"}>← BACK TO HOME</button>
+          <button onClick={()=>setPage("landing")} className="f-mono" style={{background:"transparent",border:"1px solid rgba(0,255,65,.3)",color:"rgba(0,255,65,.7)",padding:"8px 18px",borderRadius:4,fontSize:11,letterSpacing:1,cursor:"none",display:"flex",alignItems:"center",gap:8,transition:"all .2s"}} onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(0,255,65,.7)"} onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(0,255,65,.3)"}>â† BACK TO HOME</button>
         ) : (
           <>
             {["Features","How It Works","Pricing"].map(l=>(<a key={l} href={`#${l.toLowerCase().replace(/ /g,"-")}`} className="f-mono" style={{color:"rgba(200,220,238,.6)",fontSize:12,letterSpacing:1,transition:"color .2s",textDecoration:"none"}} onMouseEnter={e=>e.target.style.color="#00FF41"} onMouseLeave={e=>e.target.style.color="rgba(200,220,238,.6)"}>{l}</a>))}
@@ -380,9 +529,9 @@ const Nav = ({page, setPage, scrollY}) => {
   );
 };
 
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    LANDING PAGE
-═══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const LandingPage = ({mx, my, goToApp}) => (
   <div style={{position:"relative",zIndex:1}}>
     {/* Hero */}
@@ -397,14 +546,14 @@ const LandingPage = ({mx, my, goToApp}) => (
           <span className="shimmer-text">BEFORE THEY STRIKE</span>
         </motion.h1>
         <motion.p initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:.6,delay:.2}} style={{color:"rgba(200,220,238,.65)",fontSize:16,lineHeight:1.8,marginBottom:36,maxWidth:460}}>
-          Sentinel uses military-grade sonar intelligence to scan every email in real-time — detecting phishing, malware, spoofing, and zero-day exploits before they reach your inbox.
+          Sentinel uses military-grade sonar intelligence to scan every email in real-time â€” detecting phishing, malware, spoofing, and zero-day exploits before they reach your inbox.
         </motion.p>
         <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{duration:.6,delay:.3}} style={{display:"flex",gap:14,flexWrap:"wrap",marginBottom:48}}>
           <button onClick={goToApp} className="f-orb" style={{padding:"14px 32px",borderRadius:4,fontSize:12,fontWeight:700,letterSpacing:2,cursor:"none",background:"rgba(0,255,65,.14)",border:"1px solid rgba(0,255,65,.5)",color:"#00FF41",boxShadow:"0 0 30px rgba(0,255,65,.15)",transition:"all .25s"}} onMouseEnter={e=>{e.target.style.background="rgba(0,255,65,.26)";e.target.style.boxShadow="0 0 50px rgba(0,255,65,.3)";}} onMouseLeave={e=>{e.target.style.background="rgba(0,255,65,.14)";e.target.style.boxShadow="0 0 30px rgba(0,255,65,.15)";}}>START FREE TRIAL</button>
           <button onClick={goToApp} className="f-orb" style={{padding:"14px 32px",borderRadius:4,fontSize:12,fontWeight:700,letterSpacing:2,cursor:"none",background:"transparent",border:"1px solid rgba(200,220,238,.2)",color:"rgba(200,220,238,.7)",transition:"all .25s"}} onMouseEnter={e=>{e.target.style.borderColor="rgba(0,229,255,.4)";e.target.style.color="#00E5FF";}} onMouseLeave={e=>{e.target.style.borderColor="rgba(200,220,238,.2)";e.target.style.color="rgba(200,220,238,.7)";}}>VIEW LIVE DEMO</button>
         </motion.div>
         <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{duration:.6,delay:.5}} style={{display:"flex",gap:24,alignItems:"center",flexWrap:"wrap"}}>
-          {["SOC2 CERTIFIED","GDPR COMPLIANT","ISO 27001","ZERO LOGS"].map(b=>(<div key={b} style={{display:"flex",alignItems:"center",gap:6}}><span style={{color:"rgba(0,255,65,.5)",fontSize:8}}>◆</span><span className="f-mono" style={{color:"rgba(200,220,238,.4)",fontSize:9,letterSpacing:1}}>{b}</span></div>))}
+          {["SOC2 CERTIFIED","GDPR COMPLIANT","ISO 27001","ZERO LOGS"].map(b=>(<div key={b} style={{display:"flex",alignItems:"center",gap:6}}><span style={{color:"rgba(0,255,65,.5)",fontSize:8}}>â—†</span><span className="f-mono" style={{color:"rgba(200,220,238,.4)",fontSize:9,letterSpacing:1}}>{b}</span></div>))}
         </motion.div>
       </div>
       <motion.div initial={{opacity:0,scale:.9}} animate={{opacity:1,scale:1}} transition={{duration:.8,delay:.2}} style={{flex:1,display:"flex",justifyContent:"center",alignItems:"center",minWidth:0,overflow:"hidden"}}>
@@ -427,16 +576,16 @@ const LandingPage = ({mx, my, goToApp}) => (
     {/* Features */}
     <section style={{padding:"100px 5%"}}>
       <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} style={{textAlign:"center",marginBottom:64}}>
-        <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:12}}>◆ CAPABILITIES ◆</div>
+        <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:12}}>â—† CAPABILITIES â—†</div>
         <h2 className="f-orb" style={{fontSize:"clamp(28px,3.5vw,44px)",fontWeight:900,color:"#C8DCEE",letterSpacing:-1}}>MILITARY-GRADE <span style={{color:"#00FF41"}}>PROTECTION</span></h2>
       </motion.div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:20}}>
-        <FeatureCard delay={0}   icon="⬡" color="#00FF41"  title="SONAR DETECTION"    desc="Our proprietary ping-wave algorithm maps your email landscape in real-time, detecting anomalies the instant they appear — milliseconds before delivery."/>
-        <FeatureCard delay={0.1} icon="◈" color="#00E5FF"  title="ZERO-DAY DEFENSE"   desc="AI pattern-matching trained on 50B+ threat samples identifies unknown attack vectors with 99.3% accuracy, even without prior signatures."/>
-        <FeatureCard delay={0.2} icon="◆" color="#00FFA3"  title="LINK DETONATION"    desc="Every URL is detonated in an isolated sandbox environment. Our crawler follows redirects and analyzes final destinations before you ever click."/>
-        <FeatureCard delay={0.3} icon="▲" color="red"      title="THREAT LOCKDOWN"    desc="Confirmed threats are quarantined instantly with lock-bracket isolation. Admins receive real-time alerts with full forensic analysis."/>
-        <FeatureCard delay={0.4} icon="◇" color="#00E5FF"  title="BEHAVIORAL AI"      desc="Machine learning models analyze sender behavior, timing patterns, and linguistic anomalies to detect impersonation and BEC attacks."/>
-        <FeatureCard delay={0.5} icon="⬡" color="#00FF41"  title="CONTINUOUS RADAR"   desc="24/7 persistent threat monitoring with adaptive sensitivity. The system recalibrates detection thresholds dynamically."/>
+        <FeatureCard delay={0}   icon="â¬¡" color="#00FF41"  title="SONAR DETECTION"    desc="Our proprietary ping-wave algorithm maps your email landscape in real-time, detecting anomalies the instant they appear â€” milliseconds before delivery."/>
+        <FeatureCard delay={0.1} icon="â—ˆ" color="#00E5FF"  title="ZERO-DAY DEFENSE"   desc="AI pattern-matching trained on 50B+ threat samples identifies unknown attack vectors with 99.3% accuracy, even without prior signatures."/>
+        <FeatureCard delay={0.2} icon="â—†" color="#00FFA3"  title="LINK DETONATION"    desc="Every URL is detonated in an isolated sandbox environment. Our crawler follows redirects and analyzes final destinations before you ever click."/>
+        <FeatureCard delay={0.3} icon="â–²" color="red"      title="THREAT LOCKDOWN"    desc="Confirmed threats are quarantined instantly with lock-bracket isolation. Admins receive real-time alerts with full forensic analysis."/>
+        <FeatureCard delay={0.4} icon="â—‡" color="#00E5FF"  title="BEHAVIORAL AI"      desc="Machine learning models analyze sender behavior, timing patterns, and linguistic anomalies to detect impersonation and BEC attacks."/>
+        <FeatureCard delay={0.5} icon="â¬¡" color="#00FF41"  title="CONTINUOUS RADAR"   desc="24/7 persistent threat monitoring with adaptive sensitivity. The system recalibrates detection thresholds dynamically."/>
       </div>
     </section>
 
@@ -445,11 +594,11 @@ const LandingPage = ({mx, my, goToApp}) => (
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:80,alignItems:"center",maxWidth:1100,margin:"0 auto"}}>
         <div>
           <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} style={{marginBottom:48}}>
-            <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:12}}>◆ HOW IT WORKS ◆</div>
+            <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:12}}>â—† HOW IT WORKS â—†</div>
             <h2 className="f-orb" style={{fontSize:"clamp(28px,3vw,40px)",fontWeight:900,color:"#C8DCEE",letterSpacing:-1,lineHeight:1.2}}>FROM INBOX TO<br/><span style={{color:"#00FF41"}}>VERDICT</span> IN 0.3ms</h2>
           </motion.div>
           <div style={{display:"flex",flexDirection:"column",gap:32}}>
-            <Step delay={0.1} num="01" title="EMAIL INTERCEPTED" desc="Every incoming email is intercepted at the MX layer before delivery. Zero latency impact — your users never notice a delay."/>
+            <Step delay={0.1} num="01" title="EMAIL INTERCEPTED" desc="Every incoming email is intercepted at the MX layer before delivery. Zero latency impact â€” your users never notice a delay."/>
             <Step delay={0.2} num="02" title="SONAR SCAN INITIATED" desc="Our ping-wave engine emits a detection signal across the email structure, mapping every link, attachment, header anomaly, and behavioral signature."/>
             <Step delay={0.3} num="03" title="THREATS ECHO BACK" desc="Malicious elements echo back a unique signature. The AI classifies each echo by threat type, confidence score, and severity in real-time."/>
             <Step delay={0.4} num="04" title="VERDICT DELIVERED" desc="Clean emails delivered instantly. Threats quarantined, logged with full forensics, and your security team alerted with actionable intelligence."/>
@@ -458,9 +607,9 @@ const LandingPage = ({mx, my, goToApp}) => (
         <motion.div initial={{opacity:0,scale:.95}} whileInView={{opacity:1,scale:1}} viewport={{once:true}} transition={{duration:.7}} style={{position:"relative"}}>
           <div className="glass-lp" style={{borderRadius:12,padding:32,position:"relative",overflow:"hidden"}}>
             <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:"linear-gradient(90deg,transparent,#00FF41,transparent)",opacity:.4,animation:"scan-h 3s linear infinite"}}/>
-            <div className="f-mono" style={{color:"rgba(0,255,65,.5)",fontSize:9,letterSpacing:2,marginBottom:20}}>◆ LIVE ANALYSIS FEED</div>
+            <div className="f-mono" style={{color:"rgba(0,255,65,.5)",fontSize:9,letterSpacing:2,marginBottom:20}}>â—† LIVE ANALYSIS FEED</div>
             {[{label:"PHISHING LINK DETECTED",val:"BLOCKED",color:"#FF6060",time:"0.12ms"},{label:"SENDER VERIFIED",val:"CLEAN",color:"#00FF41",time:"0.08ms"},{label:"ATTACHMENT SANDBOXED",val:"SCANNING",color:"#FFD60A",time:"0.31ms"},{label:"HEADER SPOOFING",val:"BLOCKED",color:"#FF6060",time:"0.09ms"},{label:"URL REPUTATION CHECK",val:"CLEAN",color:"#00FF41",time:"0.15ms"},{label:"BEHAVIORAL ANALYSIS",val:"ANOMALY",color:"#FF9500",time:"0.22ms"}].map((item,i)=>(<motion.div key={i} initial={{opacity:0,x:-10}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{delay:i*.1}} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid rgba(0,255,65,.06)"}}><div style={{display:"flex",alignItems:"center",gap:10}}><span style={{width:5,height:5,borderRadius:"50%",background:item.color,flexShrink:0,boxShadow:`0 0 6px ${item.color}`}}/><span className="f-mono" style={{color:"rgba(200,220,238,.7)",fontSize:11}}>{item.label}</span></div><div style={{display:"flex",alignItems:"center",gap:12}}><span className="f-mono" style={{color:"rgba(200,220,238,.3)",fontSize:9}}>{item.time}</span><span className="f-mono" style={{color:item.color,fontSize:10,fontWeight:500,letterSpacing:1}}>{item.val}</span></div></motion.div>))}
-            <div style={{marginTop:20,padding:"12px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}><span className="f-mono" style={{color:"rgba(0,255,65,.5)",fontSize:10}}>VERDICT:</span><span className="f-orb" style={{color:"#FF6060",fontSize:14,fontWeight:700,letterSpacing:2}}>⚠ THREAT DETECTED</span></div>
+            <div style={{marginTop:20,padding:"12px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}><span className="f-mono" style={{color:"rgba(0,255,65,.5)",fontSize:10}}>VERDICT:</span><span className="f-orb" style={{color:"#FF6060",fontSize:14,fontWeight:700,letterSpacing:2}}>âš  THREAT DETECTED</span></div>
           </div>
         </motion.div>
       </div>
@@ -469,12 +618,12 @@ const LandingPage = ({mx, my, goToApp}) => (
     {/* Testimonials */}
     <section style={{padding:"100px 5%"}}>
       <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} style={{textAlign:"center",marginBottom:56}}>
-        <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:12}}>◆ TRUSTED BY SECURITY TEAMS ◆</div>
+        <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:12}}>â—† TRUSTED BY SECURITY TEAMS â—†</div>
         <h2 className="f-orb" style={{fontSize:"clamp(24px,3vw,38px)",fontWeight:900,color:"#C8DCEE",letterSpacing:-1}}>WHAT <span style={{color:"#00FF41"}}>DEFENDERS</span> SAY</h2>
       </motion.div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:20}}>
         <Testimonial delay={0} quote="Sentinel caught a sophisticated BEC attack targeting our CFO within 80ms. The sonar radar visualization made it immediately clear exactly what we were dealing with." name="MARCUS CHEN" role="CISO" company="Meridian Financial"/>
-        <Testimonial delay={0.15} quote="We replaced three legacy email security tools with Sentinel. Detection rate went from 94% to 99.97%. The false positive rate dropped by 80%. ROI was immediate." name="SARA KOVAČ" role="VP Security" company="TechCore Systems"/>
+        <Testimonial delay={0.15} quote="We replaced three legacy email security tools with Sentinel. Detection rate went from 94% to 99.97%. The false positive rate dropped by 80%. ROI was immediate." name="SARA KOVAÄŒ" role="VP Security" company="TechCore Systems"/>
         <Testimonial delay={0.3} quote="The real-time radar interface gives our SOC team situational awareness we never had before. It feels like finally being able to see the battlefield." name="ALEX OKAFOR" role="SOC Director" company="DefendNet Global"/>
       </div>
     </section>
@@ -482,7 +631,7 @@ const LandingPage = ({mx, my, goToApp}) => (
     {/* Pricing */}
     <section id="pricing" style={{padding:"100px 5%"}}>
       <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} style={{textAlign:"center",marginBottom:64}}>
-        <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:12}}>◆ PRICING ◆</div>
+        <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:12}}>â—† PRICING â—†</div>
         <h2 className="f-orb" style={{fontSize:"clamp(28px,3.5vw,44px)",fontWeight:900,color:"#C8DCEE",letterSpacing:-1}}>CHOOSE YOUR <span style={{color:"#00FF41"}}>DEFENSE TIER</span></h2>
       </motion.div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:20,maxWidth:1000,margin:"0 auto"}}>
@@ -497,7 +646,7 @@ const LandingPage = ({mx, my, goToApp}) => (
       <motion.div initial={{opacity:0,y:30}} whileInView={{opacity:1,y:0}} viewport={{once:true}} style={{borderRadius:12,padding:"60px 5%",textAlign:"center",position:"relative",overflow:"hidden",background:"rgba(0,255,65,.04)",border:"1px solid rgba(0,255,65,.2)",boxShadow:"0 0 80px rgba(0,255,65,.06),inset 0 0 60px rgba(0,255,65,.02)"}}>
         <div style={{position:"absolute",top:0,left:0,right:0,height:1,background:"linear-gradient(90deg,transparent,rgba(0,255,65,.5),transparent)"}}/>
         <div style={{position:"absolute",bottom:0,left:0,right:0,height:1,background:"linear-gradient(90deg,transparent,rgba(0,255,65,.5),transparent)"}}/>
-        <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:16}}>◆ START TODAY ◆</div>
+        <div className="f-mono" style={{color:"rgba(0,255,65,.6)",fontSize:10,letterSpacing:3,marginBottom:16}}>â—† START TODAY â—†</div>
         <h2 className="f-orb" style={{fontSize:"clamp(28px,4vw,52px)",fontWeight:900,lineHeight:1.1,letterSpacing:-1,marginBottom:16}}><span style={{color:"#C8DCEE"}}>YOUR INBOX IS BEING</span><br/><span className="shimmer-text">TARGETED RIGHT NOW</span></h2>
         <p style={{color:"rgba(200,220,238,.55)",fontSize:15,lineHeight:1.7,marginBottom:36,maxWidth:500,margin:"0 auto 36px"}}>Every second you wait, threats accumulate. Deploy Sentinel in under 5 minutes and start protecting your organization today.</p>
         <div style={{display:"flex",gap:14,justifyContent:"center",flexWrap:"wrap"}}>
@@ -521,16 +670,16 @@ const LandingPage = ({mx, my, goToApp}) => (
         {[{title:"PRODUCT",links:["Features","Pricing","Changelog","Roadmap","Status"]},{title:"COMPANY",links:["About","Blog","Careers","Press","Contact"]},{title:"RESOURCES",links:["Documentation","API Reference","Security","Privacy","Terms"]}].map(col=>(<div key={col.title}><div className="f-mono" style={{color:"rgba(0,255,65,.5)",fontSize:9,letterSpacing:3,marginBottom:20}}>{col.title}</div><div style={{display:"flex",flexDirection:"column",gap:12}}>{col.links.map(l=>(<a key={l} href="#" className="f-mono" style={{color:"rgba(200,220,238,.45)",fontSize:12,transition:"color .2s"}} onMouseEnter={e=>e.target.style.color="#00FF41"} onMouseLeave={e=>e.target.style.color="rgba(200,220,238,.45)"}>{l}</a>))}</div></div>))}
       </div>
       <div style={{borderTop:"1px solid rgba(0,255,65,.08)",paddingTop:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
-        <span className="f-mono" style={{color:"rgba(200,220,238,.3)",fontSize:10,letterSpacing:1}}>© 2026 SENTINEL SECURITY INC. ALL RIGHTS RESERVED.</span>
+        <span className="f-mono" style={{color:"rgba(200,220,238,.3)",fontSize:10,letterSpacing:1}}>Â© 2026 SENTINEL SECURITY INC. ALL RIGHTS RESERVED.</span>
         <div style={{display:"flex",gap:20}}>{["PRIVACY","TERMS","SECURITY"].map(l=>(<a key={l} href="#" className="f-mono" style={{color:"rgba(200,220,238,.3)",fontSize:9,letterSpacing:1,transition:"color .2s"}} onMouseEnter={e=>e.target.style.color="rgba(0,255,65,.6)"} onMouseLeave={e=>e.target.style.color="rgba(200,220,238,.3)"}>{l}</a>))}</div>
       </div>
     </footer>
   </div>
 );
 
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    ANALYZER APP PAGE
-═══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const AnalyzerApp = ({mx, my}) => {
   const [tab,setTab]=useState("upload");
   const [file,setFile]=useState(null);
@@ -539,9 +688,46 @@ const AnalyzerApp = ({mx, my}) => {
   const [drag,setDrag]=useState(false);
   const [focused,setFocused]=useState(false);
   const [phase,setPhase]=useState("idle");
+  const [analysis, setAnalysis] = useState(EMPTY_ANALYSIS);
+  const [error, setError] = useState("");
   const canScan=file||(body.trim().length>5);
-  const analyze=()=>{setPhase("scanning");setTimeout(()=>setPhase("result"),4800);};
-  const reset=()=>{setPhase("idle");setFile(null);setBody("");setSubj("");};
+  const analyze = async () => {
+    if (!canScan) return;
+    setError("");
+    setPhase("scanning");
+
+    try {
+      let response;
+      if (tab === "upload" && file) {
+        const form = new FormData();
+        form.append("file", file);
+        response = await fetch(`${API_BASE}/analyze-email`, { method: "POST", body: form });
+      } else {
+        response = await fetch(`${API_BASE}/analyze-text`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subject: subj, body }),
+        });
+      }
+
+      if (!response.ok) {
+        const errPayload = await response.json().catch(() => ({}));
+        const detail = typeof errPayload?.detail === "string" ? errPayload.detail : `Request failed (${response.status})`;
+        throw new Error(detail);
+      }
+
+      const payload = await response.json();
+      setAnalysis(mapApiResponseToView(payload));
+      setPhase("result");
+    } catch (e) {
+      console.error("Analyze failed", e);
+      setError(e?.message || "Could not analyze this email.");
+      setPhase("idle");
+    }
+  };
+  const reset=()=>{setPhase("idle");setFile(null);setBody("");setSubj("");setError("");setAnalysis(EMPTY_ANALYSIS);};
+  const result = analysis || EMPTY_ANALYSIS;
+  const phishScore = Math.min(100, Math.max(0, result.stats.phishKw * 25));
   const DRow=({k,v,status})=>(<div style={{display:"flex",gap:10,alignItems:"center",padding:"8px 0",borderBottom:"1px solid rgba(0,229,255,.05)"}}><span className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.5)",letterSpacing:1.5,minWidth:60}}>{k}</span><span className="f-mono" style={{fontSize:11,color:status==="bad"?"#FF4D6D":status==="warn"?"#FFD60A":"#6899B8",flex:1,wordBreak:"break-all"}}>{v}</span>{status&&<span className="f-mono" style={{fontSize:8,padding:"2px 8px",borderRadius:4,flexShrink:0,background:status==="bad"?"rgba(255,77,109,.1)":status==="warn"?"rgba(255,214,10,.1)":"rgba(0,255,163,.1)",border:`1px solid ${status==="bad"?"rgba(255,77,109,.3)":status==="warn"?"rgba(255,214,10,.3)":"rgba(0,255,163,.3)"}`,color:status==="bad"?"#FF4D6D":status==="warn"?"#FFD60A":"#00FFA3"}}>{status==="bad"?"FAIL":status==="warn"?"WARN":"PASS"}</span>}</div>);
 
   return (
@@ -552,7 +738,7 @@ const AnalyzerApp = ({mx, my}) => {
       <section style={{textAlign:"center",padding:"20px 0 28px"}}>
         <ThreatRadar mx={mx} my={my}/>
         <motion.div initial={{opacity:0,y:32}} animate={{opacity:1,y:0}} transition={{delay:.4,duration:.8}}>
-          <div className="f-mono" style={{fontSize:10,color:"rgba(0,229,255,.4)",letterSpacing:5,marginTop:20,marginBottom:14}}>◆ AI-POWERED SECURITY ANALYSIS ◆</div>
+          <div className="f-mono" style={{fontSize:10,color:"rgba(0,229,255,.4)",letterSpacing:5,marginTop:20,marginBottom:14}}>â—† AI-POWERED SECURITY ANALYSIS â—†</div>
           <h1 className="f-orb" style={{fontSize:"clamp(28px,5vw,46px)",fontWeight:900,lineHeight:1.15,letterSpacing:1}}>
             <span style={{color:"#D0E8F8"}}>AI Email Threat</span><br/>
             <span style={{background:"linear-gradient(90deg,#00E5FF 0%,#00FFA3 50%,#7C3AED 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",filter:"drop-shadow(0 0 20px rgba(0,229,255,.4))"}}>Analyzer</span>
@@ -570,20 +756,20 @@ const AnalyzerApp = ({mx, my}) => {
           <motion.section initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-30,scale:.97}} transition={{delay:.6,duration:.6}}>
             <div className={`glass-card ${focused?"glass-card-glow":""} anim-border-glow`} style={{padding:"28px 30px",marginBottom:20,transition:"all .3s"}}>
               {[{t:0,l:0,bt:"2px solid rgba(0,229,255,.5)",bl:"2px solid rgba(0,229,255,.5)"},{t:0,r:0,bt:"2px solid rgba(0,229,255,.5)",br:"2px solid rgba(0,229,255,.5)"},{b:0,l:0,bb:"2px solid rgba(0,229,255,.5)",bl:"2px solid rgba(0,229,255,.5)"},{b:0,r:0,bb:"2px solid rgba(0,229,255,.5)",br:"2px solid rgba(0,229,255,.5)"}].map((s,i)=>(<div key={i} style={{position:"absolute",width:16,height:16,...s}}/>))}
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:22}}><div className="f-orb" style={{fontSize:9,color:"rgba(0,229,255,.4)",letterSpacing:3}}>EMAIL INPUT</div><div className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.35)",letterSpacing:1}}>MAX 25MB · .EML .MSG .TXT</div></div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:22}}><div className="f-orb" style={{fontSize:9,color:"rgba(0,229,255,.4)",letterSpacing:3}}>EMAIL INPUT</div><div className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.35)",letterSpacing:1}}>MAX 25MB Â· .EML .MSG .TXT</div></div>
               <div style={{display:"flex",background:"rgba(0,0,0,.5)",borderRadius:10,padding:4,width:"fit-content",marginBottom:24,border:"1px solid rgba(0,229,255,.07)"}}>
-                {[["upload","📎 Upload .eml"],["paste","✏️ Paste Email"]].map(([id,lbl])=>(<button key={id} onClick={()=>setTab(id)} style={{padding:"9px 22px",borderRadius:7,border:"none",cursor:"pointer",fontFamily:"'JetBrains Mono',monospace",fontSize:11,letterSpacing:1,transition:"all .25s",background:tab===id?"rgba(0,229,255,.1)":"transparent",color:tab===id?"#00E5FF":"rgba(100,140,170,.4)",boxShadow:tab===id?"0 0 16px rgba(0,229,255,.2),inset 0 1px 0 rgba(0,229,255,.1)":"none"}}>{lbl}</button>))}
+                {[["upload","ðŸ“Ž Upload .eml"],["paste","âœï¸ Paste Email"]].map(([id,lbl])=>(<button key={id} onClick={()=>setTab(id)} style={{padding:"9px 22px",borderRadius:7,border:"none",cursor:"pointer",fontFamily:"'JetBrains Mono',monospace",fontSize:11,letterSpacing:1,transition:"all .25s",background:tab===id?"rgba(0,229,255,.1)":"transparent",color:tab===id?"#00E5FF":"rgba(100,140,170,.4)",boxShadow:tab===id?"0 0 16px rgba(0,229,255,.2),inset 0 1px 0 rgba(0,229,255,.1)":"none"}}>{lbl}</button>))}
               </div>
               <AnimatePresence mode="wait">
                 {tab==="upload"?(
                   <motion.div key="up" initial={{opacity:0,x:-18}} animate={{opacity:1,x:0}} exit={{opacity:0,x:18}} transition={{duration:.2}} onDragOver={e=>{e.preventDefault();setDrag(true);}} onDragLeave={()=>setDrag(false)} onDrop={e=>{e.preventDefault();setDrag(false);const f=e.dataTransfer.files[0];if(f)setFile(f);}} onClick={()=>document.getElementById("fi2").click()} style={{border:`1.5px dashed ${drag?"#00E5FF":file?"#00FFA3":"rgba(0,229,255,.16)"}`,borderRadius:12,padding:"50px 28px",textAlign:"center",cursor:"pointer",background:drag?"rgba(0,229,255,.04)":"rgba(0,0,0,.2)",transition:"all .3s"}}>
                     <input id="fi2" type="file" accept=".eml,.msg,.txt" style={{display:"none"}} onChange={e=>{const f=e.target.files[0];if(f)setFile(f);}}/>
-                    <div style={{fontSize:44,marginBottom:14}}>{file?"✅":"📧"}</div>
-                    {file?(<><div className="f-mono" style={{color:"#00FFA3",fontSize:14}}>{file.name}</div><div style={{color:"rgba(0,255,163,.4)",fontSize:12,marginTop:6}}>{(file.size/1024).toFixed(1)} KB · Ready for analysis</div></>):(<><div className="f-orb" style={{color:"rgba(100,140,170,.5)",fontSize:11,letterSpacing:3}}>DROP FILE HERE</div><div style={{color:"rgba(100,140,170,.25)",fontSize:12,marginTop:8}}>or click to browse — supports .eml, .msg, .txt</div></>)}
+                    <div style={{fontSize:44,marginBottom:14}}>{file?"âœ…":"ðŸ“§"}</div>
+                    {file?(<><div className="f-mono" style={{color:"#00FFA3",fontSize:14}}>{file.name}</div><div style={{color:"rgba(0,255,163,.4)",fontSize:12,marginTop:6}}>{(file.size/1024).toFixed(1)} KB Â· Ready for analysis</div></>):(<><div className="f-orb" style={{color:"rgba(100,140,170,.5)",fontSize:11,letterSpacing:3}}>DROP FILE HERE</div><div style={{color:"rgba(100,140,170,.25)",fontSize:12,marginTop:8}}>or click to browse â€” supports .eml, .msg, .txt</div></>)}
                   </motion.div>
                 ):(
                   <motion.div key="ps" initial={{opacity:0,x:18}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-18}} transition={{duration:.2}}>
-                    <div style={{marginBottom:16}}><label className="f-mono" style={{display:"block",fontSize:9,color:"rgba(100,140,170,.45)",letterSpacing:2,marginBottom:8}}>SUBJECT LINE</label><input value={subj} onChange={e=>setSubj(e.target.value)} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} placeholder="Re: Urgent — Verify Your Account Immediately" className="cyber-input" style={{padding:"12px 16px"}}/></div>
+                    <div style={{marginBottom:16}}><label className="f-mono" style={{display:"block",fontSize:9,color:"rgba(100,140,170,.45)",letterSpacing:2,marginBottom:8}}>SUBJECT LINE</label><input value={subj} onChange={e=>setSubj(e.target.value)} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} placeholder="Re: Urgent â€” Verify Your Account Immediately" className="cyber-input" style={{padding:"12px 16px"}}/></div>
                     <div><label className="f-mono" style={{display:"block",fontSize:9,color:"rgba(100,140,170,.45)",letterSpacing:2,marginBottom:8}}>FULL EMAIL BODY</label><textarea value={body} onChange={e=>setBody(e.target.value)} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} placeholder={"Paste complete email content here...\n\nInclude headers for best analysis results."} rows={9} className="cyber-input" style={{padding:"14px 16px",resize:"vertical",lineHeight:1.7}}/></div>
                   </motion.div>
                 )}
@@ -599,9 +785,10 @@ const AnalyzerApp = ({mx, my}) => {
                   <motion.div key="btn" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}>
                     <motion.button onClick={analyze} disabled={!canScan} whileHover={canScan?{scale:1.04,y:-2}:{}} whileTap={canScan?{scale:.96}:{}} style={{padding:"17px 68px",borderRadius:10,border:"none",cursor:canScan?"pointer":"not-allowed",background:canScan?"linear-gradient(135deg,rgba(0,229,255,.16),rgba(124,58,237,.22))":"rgba(255,255,255,.02)",boxShadow:canScan?"0 0 40px rgba(0,229,255,.22),0 0 80px rgba(0,229,255,.08),inset 0 1px 0 rgba(0,229,255,.15)":"none",borderWidth:1,borderStyle:"solid",borderColor:canScan?"rgba(0,229,255,.38)":"rgba(255,255,255,.04)",transition:"all .3s",position:"relative",overflow:"hidden"}}>
                       {canScan&&<div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,transparent,rgba(0,229,255,.06),transparent)",animation:"data-scroll 3s linear infinite"}}/>}
-                      <span className="f-orb" style={{fontSize:12,letterSpacing:4,color:canScan?"#00E5FF":"rgba(100,140,170,.2)",position:"relative",zIndex:1}}>⬡ ANALYZE EMAIL</span>
+                      <span className="f-orb" style={{fontSize:12,letterSpacing:4,color:canScan?"#00E5FF":"rgba(100,140,170,.2)",position:"relative",zIndex:1}}>â¬¡ ANALYZE EMAIL</span>
                     </motion.button>
                     {!canScan&&<p className="f-mono" style={{color:"rgba(100,140,170,.2)",fontSize:9,letterSpacing:2,marginTop:16}}>UPLOAD OR PASTE EMAIL TO BEGIN SCAN</p>}
+                    {error && <p className="f-mono" style={{ color: "#FF7B91", fontSize: 10, letterSpacing: 1, marginTop: 12 }}>{error}</p>}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -615,36 +802,124 @@ const AnalyzerApp = ({mx, my}) => {
         {phase==="result"&&(
           <motion.section initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}>
             <motion.div initial={{opacity:0,y:-10}} animate={{opacity:1,y:0}} transition={{delay:.1}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-              <div style={{display:"flex",alignItems:"center",gap:12}}><div style={{width:6,height:6,borderRadius:"50%",background:"#00FFA3",boxShadow:"0 0 8px #00FFA3",animation:"pulse-ring 1.5s ease-in-out infinite"}}/><span className="f-orb" style={{fontSize:9,color:"rgba(0,255,163,.6)",letterSpacing:3}}>ANALYSIS COMPLETE</span><span className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.3)",letterSpacing:1}}>· 0.34s</span></div>
-              <button onClick={reset} className="f-mono" style={{background:"none",border:"1px solid rgba(0,229,255,.15)",borderRadius:7,color:"rgba(100,140,170,.5)",padding:"7px 16px",cursor:"pointer",fontSize:9,letterSpacing:1.5,transition:"all .2s"}} onMouseEnter={e=>{e.target.style.color="#00E5FF";e.target.style.borderColor="rgba(0,229,255,.4)";}} onMouseLeave={e=>{e.target.style.color="rgba(100,140,170,.5)";e.target.style.borderColor="rgba(0,229,255,.15)";}}>← NEW SCAN</button>
+              <div style={{display:"flex",alignItems:"center",gap:12}}><div style={{width:6,height:6,borderRadius:"50%",background:"#00FFA3",boxShadow:"0 0 8px #00FFA3",animation:"pulse-ring 1.5s ease-in-out infinite"}}/><span className="f-orb" style={{fontSize:9,color:"rgba(0,255,163,.6)",letterSpacing:3}}>ANALYSIS COMPLETE</span><span className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.3)",letterSpacing:1}}>Â· 0.34s</span></div>
+              <button onClick={reset} className="f-mono" style={{background:"none",border:"1px solid rgba(0,229,255,.15)",borderRadius:7,color:"rgba(100,140,170,.5)",padding:"7px 16px",cursor:"pointer",fontSize:9,letterSpacing:1.5,transition:"all .2s"}} onMouseEnter={e=>{e.target.style.color="#00E5FF";e.target.style.borderColor="rgba(0,229,255,.4)";}} onMouseLeave={e=>{e.target.style.color="rgba(100,140,170,.5)";e.target.style.borderColor="rgba(0,229,255,.15)";}}>â† NEW SCAN</button>
             </motion.div>
             <motion.div initial={{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{delay:.15}} className="glass-card" style={{padding:"28px 32px",marginBottom:14}}>
               <div style={{display:"flex",flexWrap:"wrap",gap:28,alignItems:"center",justifyContent:"space-between"}}>
-                <Verdict v={D.verdict}/>
-                <RiskGauge score={D.riskScore}/>
+                <Verdict v={result.verdict}/>
+                <RiskGauge score={result.riskScore}/>
                 <div style={{display:"flex",flexDirection:"column",gap:20,flex:1,minWidth:200}}>
-                  <BarStat label="DETECTION CONFIDENCE" val={D.confidence} color="#00E5FF" delay={.3}/>
-                  <BarStat label="SPAM PROBABILITY" val={D.spamProb} color="#FF4D6D" delay={.4}/>
-                  <BarStat label="PHISH SCORE" val={78} color="#FFD60A" delay={.5}/>
+                  <BarStat label="DETECTION CONFIDENCE" val={result.confidence} color="#00E5FF" delay={.3}/>
+                  <BarStat label="SPAM PROBABILITY" val={result.spamProb} color="#FF4D6D" delay={.4}/>
+                  <BarStat label="PHISH SCORE" val={phishScore} color="#FFD60A" delay={.5}/>
                 </div>
               </div>
             </motion.div>
             <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{delay:.25}} className="glass-card" style={{padding:"22px 26px",marginBottom:14}}>
               <div className="f-orb" style={{fontSize:9,color:"rgba(100,140,170,.4)",letterSpacing:3,marginBottom:16}}>ACTIVE THREAT INDICATORS</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:8}}>{D.threats.map((t,i)=>(<Tag key={t} label={t.toUpperCase()} color={["#FF4D6D","#FFD60A","#FF4D6D","#FFD60A","#7C3AED","#FF4D6D","#FF4D6D","#FFD60A"][i]} delay={.35+i*.05}/>))}</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                {(result.threats.length ? result.threats : ["No strong threat indicators"]).map((t,i)=>(<Tag key={`${t}-${i}`} label={t.toUpperCase()} color={["#FF4D6D","#FFD60A","#FF4D6D","#FFD60A","#7C3AED","#FF4D6D","#FF4D6D","#FFD60A"][i % 8]} delay={.35+i*.05}/>))}
+              </div>
             </motion.div>
             <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{delay:.35}} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:14}}>
-              <StatCard icon="🔗" label="EXTRACTED LINKS" value={D.stats.links} color="#00E5FF" delay={.4}/>
-              <StatCard icon="📄" label="HTML CONTENT" value="YES" color="#7C3AED" raw delay={.45}/>
-              <StatCard icon="📎" label="ATTACHMENTS" value={D.stats.attach} color="#FF4D6D" delay={.5}/>
-              <StatCard icon="⚠️" label="PHISH KEYWORDS" value={D.stats.phishKw} color="#FFD60A" delay={.55}/>
+              <StatCard icon="ðŸ”—" label="EXTRACTED LINKS" value={result.stats.links} color="#00E5FF" delay={.4}/>
+              <StatCard icon="ðŸ“„" label="HTML CONTENT" value={result.stats.html ? "YES" : "NO"} color="#7C3AED" raw delay={.45}/>
+              <StatCard icon="ðŸ“Ž" label="ATTACHMENTS" value={result.stats.attach} color="#FF4D6D" delay={.5}/>
+              <StatCard icon="âš ï¸" label="PHISH KEYWORDS" value={result.stats.phishKw} color="#FFD60A" delay={.55}/>
             </motion.div>
             <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:.45}}>
               <div className="f-orb" style={{fontSize:9,color:"rgba(100,140,170,.4)",letterSpacing:3,marginBottom:14}}>FORENSIC ANALYSIS</div>
-              <Panel title="HEADER ANALYSIS" icon="🔍" color="#00E5FF" delay={.5}><div style={{marginTop:10}}><DRow k="FROM" v={D.headers.from} status="bad"/><DRow k="REPLY-TO" v={D.headers.replyTo} status="bad"/><DRow k="SPF" v={D.headers.spf} status="bad"/><DRow k="DKIM" v={D.headers.dkim} status="bad"/><DRow k="DMARC" v={D.headers.dmarc} status="bad"/><DRow k="DOMAIN" v={D.headers.domain} status="warn"/></div></Panel>
-              <Panel title="URL ANALYSIS" icon="🌐" color="#00FFA3" delay={.55}><div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>{D.urls.map(({url,sus,type},i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",borderRadius:8,background:sus?"rgba(255,77,109,.04)":"rgba(0,255,163,.03)",border:`1px solid ${sus?"rgba(255,77,109,.15)":"rgba(0,255,163,.12)"}`}}><span style={{fontSize:12}}>{sus?"🔴":"🟢"}</span><span className="f-mono" style={{fontSize:11,color:sus?"#FF4D6D":"#00FFA3",flex:1,wordBreak:"break-all"}}>{url}</span><span className="f-mono" style={{fontSize:8,color:sus?"rgba(255,77,109,.6)":"rgba(0,255,163,.5)",background:sus?"rgba(255,77,109,.08)":"rgba(0,255,163,.06)",border:`1px solid ${sus?"rgba(255,77,109,.2)":"rgba(0,255,163,.15)"}`,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{type}</span></div>))}</div></Panel>
-              <Panel title="ATTACHMENT ANALYSIS" icon="📎" color="#FF4D6D" delay={.6}><div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>{D.attach.map((a,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:8,background:"rgba(255,77,109,.04)",border:"1px solid rgba(255,77,109,.16)"}}><span style={{fontSize:18}}>⚠️</span><div style={{flex:1}}><div className="f-mono" style={{fontSize:12,color:"#FF4D6D"}}>{a.name}</div><div className="f-mono" style={{fontSize:9,color:"rgba(255,77,109,.45)",marginTop:3}}>DOUBLE EXTENSION — POTENTIAL EXECUTABLE DISGUISE</div></div><span className="f-mono" style={{fontSize:9,color:"#FF4D6D",background:"rgba(255,77,109,.1)",border:"1px solid rgba(255,77,109,.3)",padding:"3px 10px",borderRadius:4}}>DANGER</span></div>))}</div></Panel>
-              <Panel title="LANGUAGE SIGNALS" icon="🧠" color="#7C3AED" delay={.65}><div style={{marginTop:14}}><div className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.4)",letterSpacing:2,marginBottom:12}}>DETECTED PHISHING PATTERNS</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{D.kw.map(kw=>(<span key={kw} className="f-mono" style={{fontSize:11,color:"#9B6FE0",background:"rgba(124,58,237,.08)",border:"1px solid rgba(124,58,237,.22)",padding:"5px 13px",borderRadius:6}}>"{kw}"</span>))}</div><div style={{marginTop:18,padding:"14px 16px",borderRadius:8,background:"rgba(124,58,237,.05)",border:"1px solid rgba(124,58,237,.14)"}}><div className="f-mono" style={{fontSize:9,color:"rgba(124,58,237,.6)",letterSpacing:2,marginBottom:8}}>AI LANGUAGE ENTROPY SCORE</div><div style={{height:4,background:"rgba(255,255,255,.04)",borderRadius:99,overflow:"hidden"}}><motion.div initial={{width:0}} animate={{width:"84%"}} transition={{duration:1.5,delay:.8,ease:"easeOut"}} style={{height:"100%",background:"linear-gradient(90deg,#7C3AED66,#7C3AED)",borderRadius:99,boxShadow:"0 0 10px #7C3AED"}}/></div><div style={{display:"flex",justifyContent:"space-between",marginTop:6}}><span className="f-mono" style={{fontSize:8,color:"rgba(124,58,237,.4)"}}>LEGITIMATE</span><span className="f-mono" style={{fontSize:9,color:"#9B6FE0"}}>84% MANIPULATIVE</span></div></div></div></Panel>
+              <Panel title="HEADER ANALYSIS" icon="ðŸ”" color="#00E5FF" delay={.5}><div style={{marginTop:10}}><DRow k="FROM" v={result.headers.from} status={result.headers.from === "N/A" ? "warn" : "pass"}/><DRow k="REPLY-TO" v={result.headers.replyTo} status={result.headers.domain === "MISMATCH" ? "warn" : "pass"}/><DRow k="SPF" v={result.headers.spf} status="warn"/><DRow k="DKIM" v={result.headers.dkim} status="warn"/><DRow k="DMARC" v={result.headers.dmarc} status="warn"/><DRow k="DOMAIN" v={result.headers.domain} status={result.headers.domain === "MISMATCH" ? "warn" : "pass"}/></div></Panel>
+              <Panel title="URL ANALYSIS" icon="ðŸŒ" color="#00FFA3" delay={.55}><div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>{result.urls.map(({url,sus,type},i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",borderRadius:8,background:sus?"rgba(255,77,109,.04)":"rgba(0,255,163,.03)",border:`1px solid ${sus?"rgba(255,77,109,.15)":"rgba(0,255,163,.12)"}`}}><span style={{fontSize:12}}>{sus?"ðŸ”´":"ðŸŸ¢"}</span><span className="f-mono" style={{fontSize:11,color:sus?"#FF4D6D":"#00FFA3",flex:1,wordBreak:"break-all"}}>{url}</span><span className="f-mono" style={{fontSize:8,color:sus?"rgba(255,77,109,.6)":"rgba(0,255,163,.5)",background:sus?"rgba(255,77,109,.08)":"rgba(0,255,163,.06)",border:`1px solid ${sus?"rgba(255,77,109,.2)":"rgba(0,255,163,.15)"}`,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{type}</span></div>))}</div></Panel>
+              <Panel title="ATTACHMENT ANALYSIS" icon="ðŸ“Ž" color="#FF4D6D" delay={.6}>
+                <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+                  {result.attach.length === 0 && (
+                    <div className="f-mono" style={{ fontSize: 10, color: "rgba(100,140,170,.45)" }}>
+                      No attachments detected.
+                    </div>
+                  )}
+                  {result.attach.map((a, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        padding: "12px 14px",
+                        borderRadius: 8,
+                        background: a.danger ? "rgba(255,77,109,.04)" : "rgba(0,255,163,.03)",
+                        border: a.danger ? "1px solid rgba(255,77,109,.16)" : "1px solid rgba(0,255,163,.16)",
+                      }}
+                    >
+                      <span style={{ fontSize: 18 }}>{a.danger ? "âš ï¸" : "ðŸŸ¢"}</span>
+                      <div style={{ flex: 1 }}>
+                        <div className="f-mono" style={{ fontSize: 12, color: a.danger ? "#FF4D6D" : "#00FFA3" }}>
+                          {a.name}
+                        </div>
+                        <div className="f-mono" style={{ fontSize: 9, color: "rgba(100,140,170,.45)", marginTop: 3 }}>
+                          {a.danger ? "RISKY EXTENSION DETECTED" : "No dangerous extension detected"}
+                        </div>
+                      </div>
+                      <span
+                        className="f-mono"
+                        style={{
+                          fontSize: 9,
+                          color: a.danger ? "#FF4D6D" : "#00FFA3",
+                          background: a.danger ? "rgba(255,77,109,.1)" : "rgba(0,255,163,.1)",
+                          border: a.danger ? "1px solid rgba(255,77,109,.3)" : "1px solid rgba(0,255,163,.3)",
+                          padding: "3px 10px",
+                          borderRadius: 4,
+                        }}
+                      >
+                        {a.danger ? "DANGER" : "OK"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+              <Panel title="LANGUAGE SIGNALS" icon="ðŸ§ " color="#7C3AED" delay={.65}>
+                <div style={{ marginTop: 14 }}>
+                  <div className="f-mono" style={{ fontSize: 9, color: "rgba(100,140,170,.4)", letterSpacing: 2, marginBottom: 12 }}>
+                    DETECTED LANGUAGE FLAGS
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {(result.kw.length ? result.kw : ["No high-risk language flags"]).map((kw) => (
+                      <span
+                        key={kw}
+                        className="f-mono"
+                        style={{
+                          fontSize: 11,
+                          color: "#9B6FE0",
+                          background: "rgba(124,58,237,.08)",
+                          border: "1px solid rgba(124,58,237,.22)",
+                          padding: "5px 13px",
+                          borderRadius: 6,
+                        }}
+                      >
+                        "{kw}"
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: 18, padding: "14px 16px", borderRadius: 8, background: "rgba(124,58,237,.05)", border: "1px solid rgba(124,58,237,.14)" }}>
+                    <div className="f-mono" style={{ fontSize: 9, color: "rgba(124,58,237,.6)", letterSpacing: 2, marginBottom: 8 }}>
+                      LANGUAGE RISK SCORE
+                    </div>
+                    <div style={{ height: 4, background: "rgba(255,255,255,.04)", borderRadius: 99, overflow: "hidden" }}>
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${phishScore}%` }}
+                        transition={{ duration: 1.5, delay: 0.8, ease: "easeOut" }}
+                        style={{ height: "100%", background: "linear-gradient(90deg,#7C3AED66,#7C3AED)", borderRadius: 99, boxShadow: "0 0 10px #7C3AED" }}
+                      />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                      <span className="f-mono" style={{ fontSize: 8, color: "rgba(124,58,237,.4)" }}>LOW RISK</span>
+                      <span className="f-mono" style={{ fontSize: 9, color: "#9B6FE0" }}>{phishScore}% SIGNAL SCORE</span>
+                    </div>
+                  </div>
+                </div>
+              </Panel>
             </motion.div>
           </motion.section>
         )}
@@ -652,15 +927,15 @@ const AnalyzerApp = ({mx, my}) => {
 
       <motion.footer initial={{opacity:0}} animate={{opacity:1}} transition={{delay:1.2}} style={{textAlign:"center",marginTop:72,paddingTop:30,borderTop:"1px solid rgba(0,229,255,.05)"}}>
         <div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:20,flexWrap:"wrap"}}>{["247,832 THREATS TRACKED","99.98% UPTIME","<15ms LATENCY","AI MODEL v2.4.1"].map(s=>(<span key={s} className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.2)",letterSpacing:1}}>{s}</span>))}</div>
-        <div className="f-mono" style={{fontSize:8,color:"rgba(100,140,170,.12)",marginTop:12,letterSpacing:3}}>SENTINEL AI · THREAT INTELLIGENCE PLATFORM · BUILD 2026.03</div>
+        <div className="f-mono" style={{fontSize:8,color:"rgba(100,140,170,.12)",marginTop:12,letterSpacing:3}}>SENTINEL AI Â· THREAT INTELLIGENCE PLATFORM Â· BUILD 2026.03</div>
       </motion.footer>
     </div>
   );
 };
 
-/* ═══════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    ROOT APP
-═══════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export default function App() {
   const [page, setPage] = useState("landing");
   const [scrollY, setScrollY] = useState(0);
@@ -699,3 +974,7 @@ export default function App() {
     </div>
   );
 }
+
+
+
+

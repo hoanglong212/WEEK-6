@@ -457,7 +457,22 @@ const Panel = ({title,icon,color="#00E5FF",children,delay=0}) => {
   return (<div className="glass-card" style={{marginBottom:10,overflow:"hidden",border:`1px solid ${color}15`}}><button onClick={()=>setOpen(o=>!o)} style={{width:"100%",padding:"16px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"none",border:"none",cursor:"pointer"}}><div style={{display:"flex",alignItems:"center",gap:14}}><div style={{width:32,height:32,borderRadius:8,background:`${color}12`,border:`1px solid ${color}28`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>{icon}</div><span className="f-orb" style={{color:"#A8C0D8",fontSize:10,letterSpacing:2.5}}>{title}</span></div><span style={{color,fontSize:12,transition:"transform .2s",display:"inline-block",transform:open?"rotate(180deg)":"none"}}>▾</span></button>{open&&<div style={{padding:"4px 20px 20px",borderTop:`1px solid ${color}12`}}>{children}</div>}</div>);
 };
 const Tag = ({label,color}) => (<span className="threat-tag" style={{color,background:`${color}0D`,border:`1px solid ${color}38`}}><span style={{width:5,height:5,borderRadius:"50%",background:color,display:"inline-block",flexShrink:0}}/>{label}</span>);
-const Verdict = ({v}) => {const map={HAM:{c:"#00FFA3",label:"SAFE",sub:"No threats detected"},SUSPICIOUS:{c:"#FFD60A",label:"SUSPICIOUS",sub:"Manual review advised"},SPAM:{c:"#FF4D6D",label:"THREAT",sub:"Malicious email confirmed"}};const{c,label,sub}=map[v]||map.SUSPICIOUS;return(<motion.div initial={{scale:.5,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:"spring",stiffness:160,damping:12}} style={{padding:"20px 28px",borderRadius:14,background:`linear-gradient(135deg,${c}08 0%,rgba(0,0,0,.5) 100%)`,border:`1px solid ${c}40`,textAlign:"center",boxShadow:`0 0 40px ${c}18,0 0 80px ${c}08`}}><div className="f-mono" style={{fontSize:9,color:`${c}88`,letterSpacing:4,marginBottom:8}}>VERDICT</div><div className="f-orb" style={{fontSize:26,fontWeight:900,color:c,letterSpacing:2,textShadow:`0 0 30px ${c}99`}}>{label}</div><div className="f-mono" style={{fontSize:10,color:`${c}66`,marginTop:6,letterSpacing:.5}}>{sub}</div></motion.div>);};
+const Verdict = ({v}) => {
+  const map = {
+    HAM: { c: "#00FFA3", label: "SAFE", sub: "Low combined risk" },
+    SUSPICIOUS: { c: "#FFD60A", label: "SUSPICIOUS", sub: "Manual review advised" },
+    SPAM: { c: "#FF9500", label: "SPAM", sub: "High combined spam risk" },
+    THREAT: { c: "#FF4D6D", label: "THREAT", sub: "High confidence malicious signals" },
+  };
+  const { c, label, sub } = map[v] || map.SUSPICIOUS;
+  return (
+    <motion.div initial={{scale:.5,opacity:0}} animate={{scale:1,opacity:1}} transition={{type:"spring",stiffness:160,damping:12}} style={{padding:"20px 28px",borderRadius:14,background:`linear-gradient(135deg,${c}08 0%,rgba(0,0,0,.5) 100%)`,border:`1px solid ${c}40`,textAlign:"center",boxShadow:`0 0 40px ${c}18,0 0 80px ${c}08`}}>
+      <div className="f-mono" style={{fontSize:9,color:`${c}88`,letterSpacing:4,marginBottom:8}}>VERDICT</div>
+      <div className="f-orb" style={{fontSize:26,fontWeight:900,color:c,letterSpacing:2,textShadow:`0 0 30px ${c}99`}}>{label}</div>
+      <div className="f-mono" style={{fontSize:10,color:`${c}66`,marginTop:6,letterSpacing:.5}}>{sub}</div>
+    </motion.div>
+  );
+};
 const BarStat = ({label,val,color}) => (<div style={{marginBottom:4}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:7}}><span className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.6)",letterSpacing:1.5}}>{label}</span><span className="f-mono" style={{fontSize:12,color,fontWeight:500}}>{val}%</span></div><div style={{height:5,background:"rgba(255,255,255,.04)",borderRadius:99,overflow:"hidden"}}><div style={{width:`${val}%`,height:"100%",background:`linear-gradient(90deg,${color}60,${color})`,borderRadius:99}}/></div></div>);
 const ScanAnim = () => (<motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:20,padding:"32px 0"}}><div style={{position:"relative",width:88,height:88}}><div style={{position:"absolute",inset:0,borderRadius:"50%",border:"2px solid rgba(0,229,255,.15)",borderTopColor:"#00E5FF",animation:"spin 1s linear infinite"}}/><div style={{position:"absolute",inset:10,borderRadius:"50%",border:"1.5px solid rgba(0,255,163,.12)",borderBottomColor:"#00FFA3",animation:"cspin 1.6s linear infinite"}}/><div style={{position:"absolute",inset:20,borderRadius:"50%",border:"1px solid rgba(124,58,237,.15)",borderLeftColor:"#7C3AED",animation:"spin 2.2s linear infinite"}}/><div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}><div style={{width:14,height:14,borderRadius:"50%",background:"#00E5FF",boxShadow:"0 0 20px #00E5FF,0 0 40px #00E5FF66",animation:"pulse-ring 1.2s ease-in-out infinite"}}/></div></div><TypeWriter texts={["Parsing MIME structure...","Resolving sender domain...","Extracting anchor tags...","Analyzing language entropy...","Checking URL reputation...","Computing threat vectors...","Generating AI verdict..."]}/></motion.div>);
 
@@ -499,7 +514,8 @@ const normalizeVerdict = (verdict) => {
   if (!key) return "SUSPICIOUS";
   if (["HAM", "SAFE", "LEGITIMATE", "LEGIT"].includes(key)) return "HAM";
   if (["SUSPICIOUS", "REVIEW"].includes(key)) return "SUSPICIOUS";
-  if (["SPAM", "THREAT", "MALICIOUS"].includes(key)) return "SPAM";
+  if (["THREAT", "MALICIOUS"].includes(key)) return "THREAT";
+  if (["SPAM"].includes(key)) return "SPAM";
   return "SUSPICIOUS";
 };
 
@@ -508,6 +524,23 @@ const toPercent = (value) => {
   if (!Number.isFinite(n)) return 0;
   if (n <= 1) return Math.max(0, Math.min(100, Math.round(n * 100)));
   return Math.max(0, Math.min(100, Math.round(n)));
+};
+
+const normalizeAuthStatus = (value) => {
+  const key = String(value || "").trim().toLowerCase();
+  if (key === "pass") return "pass";
+  if (key === "fail") return "fail";
+  if (["softfail", "neutral", "temperror", "permerror"].includes(key)) return "warn";
+  if (["none", "n/a", "na", ""].includes(key)) return "na";
+  return "na";
+};
+
+const authToLabel = (value) => {
+  const status = normalizeAuthStatus(value);
+  if (status === "pass") return "PASS";
+  if (status === "fail") return "FAIL";
+  if (status === "warn") return "WARN";
+  return "N/A";
 };
 
 const urlKey = (url) =>
@@ -521,19 +554,75 @@ const deriveAttachmentExt = (filename) => {
   return match ? match[1].toLowerCase() : "";
 };
 
-const classifyHeaderDomain = (headerFlags) => {
+const classifyHeaderDomain = (headerFlags, domainAlignmentRaw) => {
+  const alignment = String(domainAlignmentRaw || "").toLowerCase();
+  if (alignment.includes("align")) return "ALIGNED";
+  if (alignment.includes("mismatch")) return "MISMATCH";
+  if (alignment.includes("unknown") || alignment.includes("n/a") || alignment.includes("na")) return "UNKNOWN";
   const hasMismatch = headerFlags.some((flag) =>
     /differs from sender domain/i.test(flag),
   );
-  return hasMismatch ? "MISMATCH" : "ALIGNED";
+  return hasMismatch ? "MISMATCH" : "UNKNOWN";
+};
+
+const TRUSTED_DOMAIN_SUFFIXES = [
+  "google.com",
+  "microsoft.com",
+  "apple.com",
+  "amazon.com",
+  "paypal.com",
+  "github.com",
+  "outlook.com",
+  "gmail.com",
+];
+
+const REDIRECT_DOMAIN_SUFFIXES = ["bit.ly", "tinyurl.com", "t.co", "lnkd.in", "c.gle", "mailchi.mp"];
+
+const extractUrlDomain = (url) => {
+  try {
+    return new URL(String(url)).hostname.toLowerCase();
+  } catch {
+    return "";
+  }
+};
+
+const domainMatchesAnySuffix = (domain, suffixes) =>
+  suffixes.some((suffix) => domain === suffix || domain.endsWith(`.${suffix}`));
+
+const classifyUrlType = (url, suspicious, tracking) => {
+  const domain = extractUrlDomain(url);
+  if (suspicious) return { type: "Suspicious", domain, tone: "bad" };
+  if (tracking && domainMatchesAnySuffix(domain, TRUSTED_DOMAIN_SUFFIXES)) {
+    return { type: "Trusted Redirect", domain, tone: "warn" };
+  }
+  if (tracking) return { type: "Tracking", domain, tone: "warn" };
+  if (domainMatchesAnySuffix(domain, REDIRECT_DOMAIN_SUFFIXES)) {
+    return { type: "Redirect", domain, tone: "warn" };
+  }
+  if (domainMatchesAnySuffix(domain, TRUSTED_DOMAIN_SUFFIXES)) {
+    return { type: "Trusted", domain, tone: "pass" };
+  }
+  return { type: "Unknown", domain, tone: "na" };
 };
 
 const mapApiResponseToView = (payload) => {
+  const headerAnalysis =
+    payload && typeof payload.header_analysis === "object" ? payload.header_analysis : {};
+  const languageAnalysis =
+    payload && typeof payload.language_analysis === "object" ? payload.language_analysis : {};
   const headerFlags = Array.isArray(payload?.header_flags)
     ? payload.header_flags
     : [];
+  const headerWarnings = Array.isArray(headerAnalysis?.header_warnings)
+    ? headerAnalysis.header_warnings
+    : Array.isArray(payload?.header_warnings)
+      ? payload.header_warnings
+      : [];
   const languageFlags = Array.isArray(payload?.language_flags)
     ? payload.language_flags
+    : [];
+  const suspiciousIndicators = Array.isArray(languageAnalysis?.suspicious_indicators)
+    ? languageAnalysis.suspicious_indicators
     : [];
   const extractedUrls = Array.isArray(payload?.extracted_urls)
     ? payload.extracted_urls
@@ -551,36 +640,68 @@ const mapApiResponseToView = (payload) => {
   const attachmentNames = Array.isArray(payload?.attachment_names)
     ? payload.attachment_names
     : [];
+  const attachmentExtensions = Array.isArray(payload?.attachment_extensions)
+    ? payload.attachment_extensions
+    : [];
   const indicators = Array.isArray(payload?.indicators) ? payload.indicators : [];
+  const phishingHits = Array.isArray(languageAnalysis?.phishing_hits)
+    ? languageAnalysis.phishing_hits
+    : [];
+  const mergedHeaderFlags = [...headerFlags, ...headerWarnings];
+  const replyToMismatch = mergedHeaderFlags.some((flag) =>
+    /reply-to domain differs from sender domain/i.test(flag),
+  );
+  const spfRaw = headerAnalysis?.spf_status ?? payload?.spf_status ?? "n/a";
+  const dkimRaw = headerAnalysis?.dkim_status ?? payload?.dkim_status ?? "n/a";
+  const dmarcRaw = headerAnalysis?.dmarc_status ?? payload?.dmarc_status ?? "n/a";
+  const domain = classifyHeaderDomain(mergedHeaderFlags, headerAnalysis?.domain_alignment ?? payload?.domain_alignment);
+  const filteredLanguageSignals = (suspiciousIndicators.length ? suspiciousIndicators : languageFlags).filter(
+    (x) => typeof x === "string" && !/^No strong phishing/i.test(x),
+  );
+  const languageRiskScore = toPercent(
+    languageAnalysis?.language_risk_score ?? payload?.language_risk_score ?? 0,
+  );
+  const phishingLanguageScore = toPercent(
+    languageAnalysis?.phishing_language_score ?? payload?.phishing_language_score ?? 0,
+  );
 
   return {
     verdict: normalizeVerdict(payload?.verdict),
     confidence: toPercent(payload?.confidence),
     spamProb: toPercent(payload?.spam_probability),
     riskScore: toPercent(payload?.risk_score),
+    phishScore: phishingLanguageScore,
     threats: indicators.filter((x) => typeof x === "string" && x.trim()).slice(0, 8),
     headers: {
-      from: payload?.sender || "N/A",
-      replyTo: payload?.reply_to || "N/A",
-      returnPath: payload?.return_path || "N/A",
-      spf: "N/A",
-      dkim: "N/A",
-      dmarc: "N/A",
-      domain: classifyHeaderDomain(headerFlags),
+      from: headerAnalysis?.from_address ?? payload?.sender ?? "N/A",
+      replyTo: headerAnalysis?.reply_to ?? payload?.reply_to ?? "N/A",
+      returnPath: headerAnalysis?.return_path ?? payload?.return_path ?? "N/A",
+      spf: authToLabel(spfRaw),
+      dkim: authToLabel(dkimRaw),
+      dmarc: authToLabel(dmarcRaw),
+      spfStatus: normalizeAuthStatus(spfRaw),
+      dkimStatus: normalizeAuthStatus(dkimRaw),
+      dmarcStatus: normalizeAuthStatus(dmarcRaw),
+      domain,
+      replyToMismatch,
+      warnings: mergedHeaderFlags,
     },
     urls: extractedUrls.map((url) => {
       const key = urlKey(url);
       const suspicious = suspiciousUrls.has(key);
       const tracking = trackingUrls.has(key);
+      const classified = classifyUrlType(url, suspicious, tracking);
       return {
         url,
+        domain: classified.domain || "n/a",
         sus: suspicious,
-        type: suspicious ? "Suspicious" : tracking ? "Tracking" : "Link",
+        tone: classified.tone,
+        type: classified.type,
       };
     }),
-    attach: attachmentNames.map((name) => {
-      const ext = deriveAttachmentExt(name);
-      const danger = [
+    attach: attachmentNames.map((name, idx) => {
+      const ext = String(attachmentExtensions[idx] || deriveAttachmentExt(name)).toLowerCase();
+      const riskyExec = [
         ".exe",
         ".js",
         ".scr",
@@ -588,17 +709,26 @@ const mapApiResponseToView = (payload) => {
         ".cmd",
         ".ps1",
         ".vbs",
-        ".docm",
-        ".xlsm",
       ].includes(ext);
-      return { name, ext, danger };
+      const riskyMacro = [".docm", ".xlsm"].includes(ext);
+      const riskyCompressed = [".zip", ".rar", ".7z"].includes(ext);
+      const danger = riskyExec || riskyMacro || riskyCompressed;
+      const reason = riskyExec
+        ? "Executable script/binary extension detected."
+        : riskyMacro
+          ? "Macro-enabled Office extension detected."
+          : riskyCompressed
+            ? "Compressed attachment detected. Review content."
+            : "No risky extension detected.";
+      return { name, ext, danger, reason };
     }),
-    kw: languageFlags,
+    kw: filteredLanguageSignals,
+    languageRisk: languageRiskScore,
     stats: {
       links: Number(payload?.url_count || extractedUrls.length || 0),
       html: Boolean(payload?.has_html),
       attach: Number(payload?.attachment_count || attachmentNames.length || 0),
-      phishKw: languageFlags.length,
+      phishKw: phishingHits.length,
     },
   };
 };
@@ -775,7 +905,7 @@ const LandingPage = ({mx, my, goToApp}) => (
         {[{title:"PRODUCT",links:["Features","Pricing","Changelog","Roadmap","Status"]},{title:"COMPANY",links:["About","Blog","Careers","Press","Contact"]},{title:"RESOURCES",links:["Documentation","API Reference","Security","Privacy","Terms"]}].map(col=>(<div key={col.title}><div className="f-mono" style={{color:"rgba(0,255,65,.5)",fontSize:9,letterSpacing:3,marginBottom:20}}>{col.title}</div><div style={{display:"flex",flexDirection:"column",gap:12}}>{col.links.map(l=>(<a key={l} href="#" className="f-mono" style={{color:"rgba(200,220,238,.45)",fontSize:12,transition:"color .2s"}} onMouseEnter={e=>e.target.style.color="#00FF41"} onMouseLeave={e=>e.target.style.color="rgba(200,220,238,.45)"}>{l}</a>))}</div></div>))}
       </div>
       <div style={{borderTop:"1px solid rgba(0,255,65,.08)",paddingTop:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
-        <span className="f-mono" style={{color:"rgba(200,220,238,.3)",fontSize:10,letterSpacing:1}}>© 2026 SENTINEL SECURITY INC. ALL RIGHTS RESERVEresult.</span>
+        <span className="f-mono" style={{color:"rgba(200,220,238,.3)",fontSize:10,letterSpacing:1}}>© 2026 SENTINEL SECURITY INC. ALL RIGHTS RESERVED.</span>
         <div style={{display:"flex",gap:20}}>{["PRIVACY","TERMS","SECURITY"].map(l=>(<a key={l} href="#" className="f-mono" style={{color:"rgba(200,220,238,.3)",fontSize:9,letterSpacing:1,transition:"color .2s"}} onMouseEnter={e=>e.target.style.color="rgba(0,255,65,.6)"} onMouseLeave={e=>e.target.style.color="rgba(200,220,238,.3)"}>{l}</a>))}</div>
       </div>
     </footer>
@@ -835,8 +965,32 @@ const AnalyzerApp = ({mx, my}) => {
   };
   const reset=()=>{setPhase("idle");setFile(null);setBody("");setSubj("");setError("");setAnalysis(EMPTY_ANALYSIS);};
   const result=analysis||EMPTY_ANALYSIS;
-  const phishScore=Math.min(100,Math.max(0,result.stats.phishKw*25));
-  const DRow=({k,v,status})=>(<div style={{display:"flex",gap:10,alignItems:"center",padding:"8px 0",borderBottom:"1px solid rgba(0,229,255,.05)"}}><span className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.5)",letterSpacing:1.5,minWidth:60}}>{k}</span><span className="f-mono" style={{fontSize:11,color:status==="bad"?"#FF4D6D":status==="warn"?"#FFD60A":"#6899B8",flex:1,wordBreak:"break-all"}}>{v}</span>{status&&<span className="f-mono" style={{fontSize:8,padding:"2px 8px",borderRadius:4,flexShrink:0,background:status==="bad"?"rgba(255,77,109,.1)":status==="warn"?"rgba(255,214,10,.1)":"rgba(0,255,163,.1)",border:`1px solid ${status==="bad"?"rgba(255,77,109,.3)":status==="warn"?"rgba(255,214,10,.3)":"rgba(0,255,163,.3)"}`,color:status==="bad"?"#FF4D6D":status==="warn"?"#FFD60A":"#00FFA3"}}>{status==="bad"?"FAIL":status==="warn"?"WARN":"PASS"}</span>}</div>);
+  const phishScore=toPercent(result.phishScore);
+  const languageRisk=toPercent(result.languageRisk);
+  const authStatusToRowStatus=(status)=>{
+    if(status==="fail") return "bad";
+    if(status==="warn") return "warn";
+    if(status==="pass") return "pass";
+    return "na";
+  };
+  const headerDomainStatus=result.headers.domain==="MISMATCH"?"bad":result.headers.domain==="ALIGNED"?"pass":"na";
+  const replyToStatus=result.headers.replyToMismatch?"warn":result.headers.replyTo==="N/A"?"na":"pass";
+  const DRow=({k,v,status})=>{
+    const palette=status==="bad"
+      ? { text:"#FF4D6D", bg:"rgba(255,77,109,.1)", border:"rgba(255,77,109,.3)", label:"FAIL" }
+      : status==="warn"
+        ? { text:"#FFD60A", bg:"rgba(255,214,10,.1)", border:"rgba(255,214,10,.3)", label:"WARN" }
+        : status==="pass"
+          ? { text:"#00FFA3", bg:"rgba(0,255,163,.1)", border:"rgba(0,255,163,.3)", label:"PASS" }
+          : { text:"#8A7AAE", bg:"rgba(138,122,174,.08)", border:"rgba(138,122,174,.25)", label:"N/A" };
+    return (
+      <div style={{display:"flex",gap:10,alignItems:"center",padding:"8px 0",borderBottom:"1px solid rgba(0,229,255,.05)"}}>
+        <span className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.5)",letterSpacing:1.5,minWidth:90}}>{k}</span>
+        <span className="f-mono" style={{fontSize:11,color:palette.text,flex:1,wordBreak:"break-all"}}>{v}</span>
+        <span className="f-mono" style={{fontSize:8,padding:"2px 8px",borderRadius:4,flexShrink:0,background:palette.bg,border:`1px solid ${palette.border}`,color:palette.text}}>{palette.label}</span>
+      </div>
+    );
+  };
 
   return (
     <div style={{position:"relative",zIndex:10,maxWidth:920,margin:"0 auto",padding:"80px 24px 120px"}}>
@@ -919,13 +1073,19 @@ const AnalyzerApp = ({mx, my}) => {
                 <div style={{display:"flex",flexDirection:"column",gap:20,flex:1,minWidth:200}}>
                   <BarStat label="DETECTION CONFIDENCE" val={result.confidence} color="#00E5FF" delay={.3}/>
                   <BarStat label="SPAM PROBABILITY" val={result.spamProb} color="#FF4D6D" delay={.4}/>
-                  <BarStat label="PHISH SCORE" val={phishScore} color="#FFD60A" delay={.5}/>
+                  <BarStat label="PHISHING LANGUAGE SCORE" val={phishScore} color="#FFD60A" delay={.5}/>
                 </div>
               </div>
             </motion.div>
             <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{delay:.25}} className="glass-card" style={{padding:"22px 26px",marginBottom:14}}>
               <div className="f-orb" style={{fontSize:9,color:"rgba(100,140,170,.4)",letterSpacing:3,marginBottom:16}}>ACTIVE THREAT INDICATORS</div>
-              <div style={{display:"flex",flexWrap:"wrap",gap:8}}>{result.threats.map((t,i)=>(<Tag key={t} label={t.toUpperCase()} color={["#FF4D6D","#FFD60A","#FF4D6D","#FFD60A","#7C3AED","#FF4D6D","#FF4D6D","#FFD60A"][i]} delay={.35+i*.05}/>))}</div>
+              {result.threats.length ? (
+                <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                  {result.threats.map((t,i)=>(<Tag key={t} label={t.toUpperCase()} color={["#FF4D6D","#FFD60A","#FF4D6D","#FFD60A","#7C3AED","#FF4D6D","#FF4D6D","#FFD60A"][i]} delay={.35+i*.05}/>))}
+                </div>
+              ) : (
+                <div className="f-mono" style={{fontSize:11,color:"rgba(120,150,175,.55)"}}>No elevated threat indicators were returned for this email.</div>
+              )}
             </motion.div>
             <motion.div initial={{opacity:0,y:18}} animate={{opacity:1,y:0}} transition={{delay:.35}} style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:14}}>
               <StatCard icon="🔗" label="EXTRACTED LINKS" value={result.stats.links} color="#00E5FF" delay={.4}/>
@@ -935,10 +1095,92 @@ const AnalyzerApp = ({mx, my}) => {
             </motion.div>
             <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:.45}}>
               <div className="f-orb" style={{fontSize:9,color:"rgba(100,140,170,.4)",letterSpacing:3,marginBottom:14}}>FORENSIC ANALYSIS</div>
-              <Panel title="HEADER ANALYSIS" icon="🔍" color="#00E5FF" delay={.5}><div style={{marginTop:10}}><DRow k="FROM" v={result.headers.from} status="bad"/><DRow k="REPLY-TO" v={result.headers.replyTo} status="bad"/><DRow k="SPF" v={result.headers.spf} status="bad"/><DRow k="DKIM" v={result.headers.dkim} status="bad"/><DRow k="DMARC" v={result.headers.dmarc} status="bad"/><DRow k="DOMAIN" v={result.headers.domain} status="warn"/></div></Panel>
-              <Panel title="URL ANALYSIS" icon="🌐" color="#00FFA3" delay={.55}><div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>{result.urls.map(({url,sus,type},i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",borderRadius:8,background:sus?"rgba(255,77,109,.04)":"rgba(0,255,163,.03)",border:`1px solid ${sus?"rgba(255,77,109,.15)":"rgba(0,255,163,.12)"}`}}><span style={{fontSize:12}}>{sus?"🔴":"🟢"}</span><span className="f-mono" style={{fontSize:11,color:sus?"#FF4D6D":"#00FFA3",flex:1,wordBreak:"break-all"}}>{url}</span><span className="f-mono" style={{fontSize:8,color:sus?"rgba(255,77,109,.6)":"rgba(0,255,163,.5)",background:sus?"rgba(255,77,109,.08)":"rgba(0,255,163,.06)",border:`1px solid ${sus?"rgba(255,77,109,.2)":"rgba(0,255,163,.15)"}`,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{type}</span></div>))}</div></Panel>
-              <Panel title="ATTACHMENT ANALYSIS" icon="📎" color="#FF4D6D" delay={.6}><div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>{result.attach.map((a,i)=>(<div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:8,background:"rgba(255,77,109,.04)",border:"1px solid rgba(255,77,109,.16)"}}><span style={{fontSize:18}}>⚠️</span><div style={{flex:1}}><div className="f-mono" style={{fontSize:12,color:"#FF4D6D"}}>{a.name}</div><div className="f-mono" style={{fontSize:9,color:"rgba(255,77,109,.45)",marginTop:3}}>DOUBLE EXTENSION — POTENTIAL EXECUTABLE DISGUISE</div></div><span className="f-mono" style={{fontSize:9,color:"#FF4D6D",background:"rgba(255,77,109,.1)",border:"1px solid rgba(255,77,109,.3)",padding:"3px 10px",borderRadius:4}}>DANGER</span></div>))}</div></Panel>
-              <Panel title="LANGUAGE SIGNALS" icon="🧠" color="#7C3AED" delay={.65}><div style={{marginTop:14}}><div className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.4)",letterSpacing:2,marginBottom:12}}>DETECTED PHISHING PATTERNS</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{result.kw.map(kw=>(<span key={kw} className="f-mono" style={{fontSize:11,color:"#9B6FE0",background:"rgba(124,58,237,.08)",border:"1px solid rgba(124,58,237,.22)",padding:"5px 13px",borderRadius:6}}>"{kw}"</span>))}</div><div style={{marginTop:18,padding:"14px 16px",borderRadius:8,background:"rgba(124,58,237,.05)",border:"1px solid rgba(124,58,237,.14)"}}><div className="f-mono" style={{fontSize:9,color:"rgba(124,58,237,.6)",letterSpacing:2,marginBottom:8}}>AI LANGUAGE ENTROPY SCORE</div><div style={{height:4,background:"rgba(255,255,255,.04)",borderRadius:99,overflow:"hidden"}}><motion.div initial={{width:0}} animate={{width:"84%"}} transition={{duration:1.5,delay:.8,ease:"easeOut"}} style={{height:"100%",background:"linear-gradient(90deg,#7C3AED66,#7C3AED)",borderRadius:99,boxShadow:"0 0 10px #7C3AED"}}/></div><div style={{display:"flex",justifyContent:"space-between",marginTop:6}}><span className="f-mono" style={{fontSize:8,color:"rgba(124,58,237,.4)"}}>LEGITIMATE</span><span className="f-mono" style={{fontSize:9,color:"#9B6FE0"}}>84% MANIPULATIVE</span></div></div></div></Panel>
+              <Panel title="HEADER ANALYSIS" icon="🔍" color="#00E5FF" delay={.5}>
+                <div style={{marginTop:10}}>
+                  <DRow k="FROM" v={result.headers.from} status={result.headers.from==="N/A"?"na":"pass"}/>
+                  <DRow k="REPLY-TO" v={result.headers.replyTo} status={replyToStatus}/>
+                  <DRow k="RETURN-PATH" v={result.headers.returnPath} status={result.headers.returnPath==="N/A"?"na":"pass"}/>
+                  <DRow k="SPF" v={result.headers.spf} status={authStatusToRowStatus(result.headers.spfStatus)}/>
+                  <DRow k="DKIM" v={result.headers.dkim} status={authStatusToRowStatus(result.headers.dkimStatus)}/>
+                  <DRow k="DMARC" v={result.headers.dmarc} status={authStatusToRowStatus(result.headers.dmarcStatus)}/>
+                  <DRow k="DOMAIN ALIGNMENT" v={result.headers.domain} status={headerDomainStatus}/>
+                  {Array.isArray(result.headers.warnings) && result.headers.warnings.length>0 && (
+                    <div style={{marginTop:12,padding:"10px 12px",borderRadius:8,background:"rgba(255,214,10,.05)",border:"1px solid rgba(255,214,10,.2)"}}>
+                      <div className="f-mono" style={{fontSize:9,color:"rgba(255,214,10,.7)",letterSpacing:1.5,marginBottom:8}}>HEADER WARNINGS</div>
+                      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                        {result.headers.warnings.slice(0,4).map((w)=><span key={w} className="f-mono" style={{fontSize:10,color:"rgba(255,214,10,.78)"}}>{w}</span>)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Panel>
+              <Panel title="URL ANALYSIS" icon="🌐" color="#00FFA3" delay={.55}>
+                <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
+                  {result.urls.length===0 && (
+                    <div className="f-mono" style={{fontSize:11,color:"rgba(120,150,175,.55)"}}>No URLs extracted from this email.</div>
+                  )}
+                  {result.urls.map(({url,domain,type,tone},i)=>{
+                    const palette=tone==="bad"
+                      ? {text:"#FF4D6D",bg:"rgba(255,77,109,.04)",border:"rgba(255,77,109,.15)",badgeBg:"rgba(255,77,109,.08)",badgeBorder:"rgba(255,77,109,.25)"}
+                      : tone==="warn"
+                        ? {text:"#FFD60A",bg:"rgba(255,214,10,.04)",border:"rgba(255,214,10,.2)",badgeBg:"rgba(255,214,10,.08)",badgeBorder:"rgba(255,214,10,.25)"}
+                        : tone==="pass"
+                          ? {text:"#00FFA3",bg:"rgba(0,255,163,.03)",border:"rgba(0,255,163,.12)",badgeBg:"rgba(0,255,163,.06)",badgeBorder:"rgba(0,255,163,.18)"}
+                          : {text:"#8A7AAE",bg:"rgba(138,122,174,.05)",border:"rgba(138,122,174,.2)",badgeBg:"rgba(138,122,174,.08)",badgeBorder:"rgba(138,122,174,.3)"};
+                    return (
+                      <div key={`${url}-${i}`} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",borderRadius:8,background:palette.bg,border:`1px solid ${palette.border}`}}>
+                        <span className="f-mono" style={{fontSize:9,color:palette.text,letterSpacing:1}}>{tone==="bad"?"RISK":tone==="warn"?"WARN":tone==="pass"?"OK":"N/A"}</span>
+                        <div style={{display:"flex",flexDirection:"column",gap:4,flex:1,minWidth:0}}>
+                          <span className="f-mono" style={{fontSize:11,color:palette.text,wordBreak:"break-all"}}>{url}</span>
+                          <span className="f-mono" style={{fontSize:9,color:"rgba(130,160,185,.55)"}}>Domain: {domain}</span>
+                        </div>
+                        <span className="f-mono" style={{fontSize:8,color:palette.text,background:palette.badgeBg,border:`1px solid ${palette.badgeBorder}`,padding:"2px 8px",borderRadius:4,flexShrink:0}}>{type}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Panel>
+              <Panel title="ATTACHMENT ANALYSIS" icon="📎" color="#FF4D6D" delay={.6}>
+                <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
+                  {result.attach.length===0 && (
+                    <div style={{padding:"12px 14px",borderRadius:8,background:"rgba(0,255,163,.03)",border:"1px solid rgba(0,255,163,.16)"}}>
+                      <div className="f-mono" style={{fontSize:11,color:"#00FFA3"}}>No attachments detected.</div>
+                    </div>
+                  )}
+                  {result.attach.map((a,i)=>{
+                    const bad=Boolean(a.danger);
+                    return (
+                      <div key={`${a.name}-${i}`} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:8,background:bad?"rgba(255,77,109,.04)":"rgba(0,255,163,.03)",border:`1px solid ${bad?"rgba(255,77,109,.16)":"rgba(0,255,163,.18)"}`}}>
+                        <span className="f-mono" style={{fontSize:10,color:bad?"#FF4D6D":"#00FFA3",letterSpacing:1}}>{bad?"RISK":"OK"}</span>
+                        <div style={{flex:1}}>
+                          <div className="f-mono" style={{fontSize:12,color:bad?"#FF4D6D":"#00FFA3"}}>{a.name}</div>
+                          <div className="f-mono" style={{fontSize:9,color:bad?"rgba(255,77,109,.55)":"rgba(0,255,163,.55)",marginTop:3}}>{a.reason}</div>
+                        </div>
+                        <span className="f-mono" style={{fontSize:9,color:bad?"#FF4D6D":"#00FFA3",background:bad?"rgba(255,77,109,.1)":"rgba(0,255,163,.08)",border:`1px solid ${bad?"rgba(255,77,109,.3)":"rgba(0,255,163,.3)"}`,padding:"3px 10px",borderRadius:4}}>
+                          {(a.ext||"n/a").toUpperCase()}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Panel>
+              <Panel title="LANGUAGE SIGNALS" icon="🧠" color="#7C3AED" delay={.65}>
+                <div style={{marginTop:14}}>
+                  <div className="f-mono" style={{fontSize:9,color:"rgba(100,140,170,.4)",letterSpacing:2,marginBottom:10}}>DETECTED SIGNALS</div>
+                  {result.kw.length===0 ? (
+                    <div className="f-mono" style={{fontSize:11,color:"rgba(120,150,175,.55)"}}>No elevated language-risk indicators were returned.</div>
+                  ) : (
+                    <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                      {result.kw.map((kw)=>(<span key={kw} className="f-mono" style={{fontSize:11,color:"#9B6FE0",background:"rgba(124,58,237,.08)",border:"1px solid rgba(124,58,237,.22)",padding:"5px 13px",borderRadius:6}}>{kw}</span>))}
+                    </div>
+                  )}
+                  <div style={{marginTop:18,padding:"14px 16px",borderRadius:8,background:"rgba(124,58,237,.05)",border:"1px solid rgba(124,58,237,.14)"}}>
+                    <BarStat label="LANGUAGE RISK (HEURISTIC)" val={languageRisk} color="#7C3AED"/>
+                    <BarStat label="PHISHING LANGUAGE (HEURISTIC)" val={phishScore} color="#9B6FE0"/>
+                    <div className="f-mono" style={{fontSize:9,color:"rgba(124,58,237,.55)",marginTop:8}}>Scores are derived from backend heuristic language rules.</div>
+                  </div>
+                </div>
+              </Panel>
             </motion.div>
           </motion.section>
         )}

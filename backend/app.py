@@ -1256,6 +1256,30 @@ def compute_confidence(verdict: str, spam_probability: float, risk_score: float)
     return clamp(confidence, 0.0, 1.0)
 
 
+def resolve_spam_class_index(classifier: Any, label_map: dict[Any, Any] | None = None) -> int:
+    """Resolve spam class index from classifier classes + optional label map."""
+    classes = list(getattr(classifier, "classes_", []))
+    if not classes:
+        return 1
+
+    normalized_map = label_map or {}
+    for idx, class_value in enumerate(classes):
+        mapped = normalized_map.get(class_value)
+        if mapped is None:
+            try:
+                mapped = normalized_map.get(int(class_value))
+            except (TypeError, ValueError):
+                mapped = None
+        if isinstance(mapped, str) and mapped.strip().lower() == "spam":
+            return idx
+
+    for idx, class_value in enumerate(classes):
+        if str(class_value).strip().lower() in {"1", "spam", "true"}:
+            return idx
+
+    return max(0, len(classes) - 1)
+
+
 def build_indicators(
     *,
     spam_probability: float,
@@ -1338,7 +1362,10 @@ def analyze_content(
         raise HTTPException(status_code=500, detail="Loaded classifier does not support predict_proba.")
 
     features = vectorizer.transform([cleaned_text])
-    spam_probability = float(classifier.predict_proba(features)[0][1])
+    class_probabilities = classifier.predict_proba(features)[0]
+    spam_index = resolve_spam_class_index(classifier, getattr(app.state, "label_map", {}))
+    spam_index = min(max(spam_index, 0), len(class_probabilities) - 1)
+    spam_probability = float(class_probabilities[spam_index])
 
     header_analysis = analyze_headers(
         sender,

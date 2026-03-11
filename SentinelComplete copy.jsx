@@ -12,9 +12,9 @@ const API_BASE =
     ? "https://week-6-qer0.onrender.com"
     : "http://127.0.0.1:8000";
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   GLOBAL STYLES â€” merged both apps
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL STYLES — merged both apps
+═══════════════════════════════════════════════════════════════ */
 const GlobalStyles = () => {
   useEffect(() => {
     const link = document.createElement("link");
@@ -134,9 +134,9 @@ const AuroraBlobs = () => (
   </div>
 );
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   THREAT RADAR â€” smooth sweep-arm + delta-time + offscreen canvas
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   THREAT RADAR — smooth sweep-arm + delta-time + offscreen canvas
+═══════════════════════════════════════════════════════════════ */
 const ThreatRadar = ({ mx, my }) => {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
@@ -171,7 +171,7 @@ const ThreatRadar = ({ mx, my }) => {
     const GD = (a) => `rgba(0,255,65,${a})`;
     const RD = (a) => `rgba(255,80,80,${a})`;
     const CD = (a) => `rgba(0,229,255,${a})`;
-    const RPM = 1 / 7; // one rotation per 7s â€” slow, cinematic
+    const RPM = 1 / 7; // one rotation per 7s — slow, cinematic
     const WORLD_SPEED = 16; // px per second downward drift
     let worldY = 0;
 
@@ -193,14 +193,14 @@ const ThreatRadar = ({ mx, my }) => {
       { label: "CRED-HARV", locked: true, wx: -100, wy: 180 },
     ].map((t) => ({ ...t, echo: 0, pulseR: 0 }));
 
-    // â”€â”€ Pre-render static layer (inner radar + decorative bezel) â”€â”€â”€â”€â”€
+    // ── Pre-render static layer (inner radar + decorative bezel) ─────
     const bg = document.createElement("canvas");
     bg.width = S * DPR;
     bg.height = S * DPR;
     const bx = bg.getContext("2d");
     bx.scale(DPR, DPR);
 
-    // â‘  Inner circle background + grid + rings
+    // ① Inner circle background + grid + rings
     bx.save();
     bx.beginPath();
     bx.arc(CX, CY, R, 0, TAU);
@@ -263,7 +263,7 @@ const ThreatRadar = ({ mx, my }) => {
       bx.lineTo(x2, y2);
       bx.stroke();
     });
-    // 45Â° diagonal marks
+    // 45° diagonal marks
     bx.strokeStyle = GD(0.05);
     bx.lineWidth = 0.4;
     [Math.PI / 4, (3 * Math.PI) / 4].forEach((a) => {
@@ -274,7 +274,7 @@ const ThreatRadar = ({ mx, my }) => {
     });
     bx.restore();
 
-    // â‘¡ Outer bezel rings (3 concentric)
+    // ② Outer bezel rings (3 concentric)
     bx.beginPath();
     bx.arc(CX, CY, R + 2, 0, TAU);
     bx.strokeStyle = GD(0.5);
@@ -296,7 +296,7 @@ const ThreatRadar = ({ mx, my }) => {
     bx.lineWidth = 0.5;
     bx.stroke();
 
-    // â‘¢ 36 ticks on bezel
+    // ③ 36 ticks on bezel
     for (let i = 0; i < 36; i++) {
       const a = (i / 36) * TAU,
         maj = i % 9 === 0,
@@ -322,7 +322,7 @@ const ThreatRadar = ({ mx, my }) => {
       }
     }
 
-    // â‘£ Arc text â€” top: "â—† SENTINEL THREAT RADAR â—†", bottom: "â—‡ EMAIL ANALYZER v2.0 â—‡"
+    // ④ Arc text — top: "◆ SENTINEL THREAT RADAR ◆", bottom: "◇ EMAIL ANALYZER v2.0 ◇"
     const drawArcText = (text, arcR, startA, dir, style, size) => {
       bx.font = `${style} ${size}px 'JetBrains Mono',monospace`;
       bx.textAlign = "center";
@@ -343,7 +343,7 @@ const ThreatRadar = ({ mx, my }) => {
     };
     bx.fillStyle = GD(0.4);
     drawArcText(
-      "â—†  ACTIVE THREAT DETECTION SYSTEM  â—†",
+      "◆  ACTIVE THREAT DETECTION SYSTEM  ◆",
       R + 36,
       -Math.PI / 2,
       "top",
@@ -352,7 +352,7 @@ const ThreatRadar = ({ mx, my }) => {
     );
     bx.fillStyle = GD(0.25);
     drawArcText(
-      "â—‡  SENTINEL  AI  RADAR  v2.0  â—‡",
+      "◇  SENTINEL  AI  RADAR  v2.0  ◇",
       R + 36,
       Math.PI / 2,
       "bottom",
@@ -360,7 +360,7 @@ const ThreatRadar = ({ mx, my }) => {
       7,
     );
 
-    // â‘¤ Side data panels (static decorative)
+    // ⑤ Side data panels (static decorative)
     const panH = 110,
       panW = 42,
       panY = CY - panH / 2;
@@ -424,7 +424,7 @@ const ThreatRadar = ({ mx, my }) => {
     bx.fillStyle = GD(0.75);
     bx.fillText("AUTO", RP + 3, panY + 112);
 
-    // â‘¥ Outer frame + corner brackets
+    // ⑥ Outer frame + corner brackets
     bx.strokeStyle = "rgba(0,180,50,0.3)";
     bx.lineWidth = 1.2;
     bx.strokeRect(1, 1, S - 2, S - 2);
@@ -449,7 +449,7 @@ const ThreatRadar = ({ mx, my }) => {
       bx.fillStyle = GD(0.8);
       bx.fill();
     });
-    // â‘¦ Top-left and top-right HUD labels (static)
+    // ⑦ Top-left and top-right HUD labels (static)
     bx.font = "bold 8px 'JetBrains Mono',monospace";
     bx.fillStyle = GD(0.5);
     bx.textAlign = "left";
@@ -459,7 +459,7 @@ const ThreatRadar = ({ mx, my }) => {
     bx.textAlign = "right";
     bx.fillText("SYSTEM ACTIVE", S - 14, 20);
 
-    // â”€â”€ Animation state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Animation state ────────────────────────────────────────
     let sweepAngle = -Math.PI / 2;
     let lastTime = null;
     let blinkT = 0;
@@ -507,11 +507,11 @@ const ThreatRadar = ({ mx, my }) => {
         if (t.echo > 0) t.pulseR = Math.min(t.pulseR + dt * 60, 50);
       });
 
-      // â”€â”€ Draw â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // ── Draw ──────────────────────────────────────────────
       ctx.clearRect(0, 0, S, S);
       ctx.drawImage(bg, 0, 0, S * DPR, S * DPR, 0, 0, S, S);
 
-      // â”€â”€ Inside circle clip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // ── Inside circle clip ──────────────────────────────
       ctx.save();
       ctx.beginPath();
       ctx.arc(CX, CY, R, 0, TAU);
@@ -531,7 +531,7 @@ const ThreatRadar = ({ mx, my }) => {
         ctx.fillStyle = `rgba(0,255,65,${frac2 * 0.07})`;
         ctx.fill();
       }
-      // Sweep arm â€” bright edge with a soft halo line
+      // Sweep arm — bright edge with a soft halo line
       ctx.beginPath();
       ctx.moveTo(CX, CY);
       ctx.lineTo(CX + Math.cos(sweepAngle) * R, CY + Math.sin(sweepAngle) * R);
@@ -650,7 +650,7 @@ const ThreatRadar = ({ mx, my }) => {
 
       ctx.restore(); // end clip
 
-      // â”€â”€ Outside clip: dynamic HUD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // ── Outside clip: dynamic HUD ──────────────────────────
       const found = THREATS.filter((t) => t.echo > 0.05);
       const locked = found.filter((t) => t.locked);
 
@@ -735,9 +735,9 @@ const ThreatRadar = ({ mx, my }) => {
   );
 };
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    SHARED SMALL COMPONENTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
 const ScanLine = () => (
   <div
     style={{
@@ -783,7 +783,7 @@ const TypeWriter = ({ texts }) => {
       <span
         style={{ animation: "blink 1s step-end infinite", color: "#00FFA3" }}
       >
-        â–Œ
+        ▌
       </span>
     </span>
   );
@@ -988,7 +988,7 @@ const Panel = ({ title, icon, color = "#00E5FF", children, delay = 0 }) => {
             transform: open ? "rotate(180deg)" : "none",
           }}
         >
-          â–¾
+          ▾
         </span>
       </button>
       {open && (
@@ -1196,7 +1196,7 @@ const ScanAnim = () => (
         "Parsing MIME structure...",
         "Resolving sender domain...",
         "Extracting anchor tags...",
-        "Analyzing language risk signals...",
+        "Analyzing language entropy...",
         "Checking URL reputation...",
         "Computing threat vectors...",
         "Generating AI verdict...",
@@ -1207,7 +1207,7 @@ const ScanAnim = () => (
 
 const DataTicker = () => {
   const items =
-    "THREAT DB UPDATED 03:24:11 UTC  â—†  247,832 PHISHING DOMAINS TRACKED  â—†  AI MODEL v2.4.1  â—†  LATENCY 12ms  â—†  UPTIME 99.98%  â—†  NEW VECTOR: BEC CAMPAIGN DETECTED  â—†  LAST SCAN: 0.3s AGO  â—†  ";
+    "THREAT DB UPDATED 03:24:11 UTC  ◆  247,832 PHISHING DOMAINS TRACKED  ◆  AI MODEL v2.4.1  ◆  LATENCY 12ms  ◆  UPTIME 99.98%  ◆  NEW VECTOR: BEC CAMPAIGN DETECTED  ◆  LAST SCAN: 0.3s AGO  ◆  ";
   return (
     <div
       style={{
@@ -1256,13 +1256,13 @@ const DataTicker = () => {
   );
 };
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    DEMO DATA
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    LANDING PAGE COMPONENTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
 const EMPTY_ANALYSIS = {
   verdict: "SUSPICIOUS",
   confidence: 0,
@@ -1273,21 +1273,14 @@ const EMPTY_ANALYSIS = {
     from: "N/A",
     replyTo: "N/A",
     returnPath: "N/A",
-    spf: { raw: "n/a", label: "N/A", tone: "na", detail: "Not available" },
-    dkim: { raw: "n/a", label: "N/A", tone: "na", detail: "Not available" },
-    dmarc: { raw: "n/a", label: "N/A", tone: "na", detail: "Not available" },
-    domain: { raw: "unknown", label: "UNKNOWN", tone: "na", detail: "Not available" },
-    warnings: [],
+    spf: "N/A",
+    dkim: "N/A",
+    dmarc: "N/A",
+    domain: "N/A",
   },
   urls: [],
   attach: [],
-  attachmentFlags: [],
-  language: {
-    riskScore: 0,
-    phishingScore: 0,
-    indicators: [],
-    heuristic: true,
-  },
+  kw: [],
   stats: { links: 0, html: false, attach: 0, phishKw: 0 },
 };
 
@@ -1320,71 +1313,20 @@ const deriveAttachmentExt = (filename) => {
   return match ? match[1].toLowerCase() : "";
 };
 
-const normalizeAuthStatus = (value) => {
-  const key = String(value || "")
-    .trim()
-    .toLowerCase();
-  if (!key) return "n/a";
-  if (["pass", "fail", "neutral", "softfail", "none", "n/a"].includes(key)) {
-    return key;
-  }
-  return "n/a";
-};
-
-const normalizeAlignment = (value) => {
-  const key = String(value || "")
-    .trim()
-    .toLowerCase();
-  if (["aligned", "mismatched", "unknown"].includes(key)) return key;
-  return "unknown";
-};
-
-const authStatusMeta = (value) => {
-  const key = normalizeAuthStatus(value);
-  if (key === "pass") return { raw: key, label: "PASS", tone: "good", detail: "Verified in header" };
-  if (key === "fail") return { raw: key, label: "FAIL", tone: "bad", detail: "Authentication failed" };
-  if (key === "softfail") return { raw: key, label: "SOFTFAIL", tone: "warn", detail: "Softfail from sender policy" };
-  if (key === "neutral") return { raw: key, label: "NEUTRAL", tone: "warn", detail: "No strong SPF assertion" };
-  if (key === "none") return { raw: key, label: "NONE", tone: "na", detail: "Not present in header" };
-  return { raw: "n/a", label: "N/A", tone: "na", detail: "Not available" };
-};
-
-const alignmentStatusMeta = (value) => {
-  const key = normalizeAlignment(value);
-  if (key === "aligned") return { raw: key, label: "ALIGNED", tone: "good", detail: "Authenticated domain matches From domain" };
-  if (key === "mismatched") return { raw: key, label: "MISMATCHED", tone: "bad", detail: "Authenticated domain differs from From domain" };
-  return { raw: "unknown", label: "UNKNOWN", tone: "na", detail: "Not enough authentication data" };
+const classifyHeaderDomain = (headerFlags) => {
+  const hasMismatch = headerFlags.some((flag) =>
+    /differs from sender domain/i.test(flag),
+  );
+  return hasMismatch ? "MISMATCH" : "ALIGNED";
 };
 
 const mapApiResponseToView = (payload) => {
-  const headerAnalysis =
-    payload?.header_analysis && typeof payload.header_analysis === "object"
-      ? payload.header_analysis
-      : {};
-  const languageAnalysis =
-    payload?.language_analysis && typeof payload.language_analysis === "object"
-      ? payload.language_analysis
-      : {};
-  const attachmentAnalysis =
-    payload?.attachment_analysis && typeof payload.attachment_analysis === "object"
-      ? payload.attachment_analysis
-      : {};
   const headerFlags = Array.isArray(payload?.header_flags)
     ? payload.header_flags
     : [];
-  const headerWarnings = Array.isArray(headerAnalysis?.header_warnings)
-    ? headerAnalysis.header_warnings
-    : Array.isArray(payload?.header_warnings)
-      ? payload.header_warnings
-      : headerFlags.filter((flag) =>
-          /missing|differs|mismatched|failed|softfail/i.test(String(flag)),
-        );
   const languageFlags = Array.isArray(payload?.language_flags)
     ? payload.language_flags
     : [];
-  const suspiciousIndicators = Array.isArray(languageAnalysis?.suspicious_indicators)
-    ? languageAnalysis.suspicious_indicators
-    : languageFlags.filter((flag) => !/no strong phishing/i.test(String(flag)));
   const extractedUrls = Array.isArray(payload?.extracted_urls)
     ? payload.extracted_urls
     : [];
@@ -1399,37 +1341,12 @@ const mapApiResponseToView = (payload) => {
       (url) => urlKey(url),
     ),
   );
-  const attachmentNames = Array.isArray(attachmentAnalysis?.attachment_names)
-    ? attachmentAnalysis.attachment_names
-    : Array.isArray(payload?.attachment_names)
-      ? payload.attachment_names
-      : [];
-  const attachmentFlags = Array.isArray(attachmentAnalysis?.attachment_flags)
-    ? attachmentAnalysis.attachment_flags
-    : Array.isArray(payload?.attachment_flags)
-      ? payload.attachment_flags
-      : [];
+  const attachmentNames = Array.isArray(payload?.attachment_names)
+    ? payload.attachment_names
+    : [];
   const indicators = Array.isArray(payload?.indicators)
     ? payload.indicators
     : [];
-  const spfMeta = authStatusMeta(
-    headerAnalysis?.spf_status ?? payload?.spf_status ?? "n/a",
-  );
-  const dkimMeta = authStatusMeta(
-    headerAnalysis?.dkim_status ?? payload?.dkim_status ?? "n/a",
-  );
-  const dmarcMeta = authStatusMeta(
-    headerAnalysis?.dmarc_status ?? payload?.dmarc_status ?? "n/a",
-  );
-  const alignmentMeta = alignmentStatusMeta(
-    headerAnalysis?.domain_alignment ?? payload?.domain_alignment ?? "unknown",
-  );
-  const languageRiskScore = toPercent(
-    languageAnalysis?.language_risk_score ?? payload?.language_risk_score,
-  );
-  const phishingLanguageScore = toPercent(
-    languageAnalysis?.phishing_language_score ?? payload?.phishing_language_score,
-  );
 
   return {
     verdict: normalizeVerdict(payload?.verdict),
@@ -1440,14 +1357,13 @@ const mapApiResponseToView = (payload) => {
       .filter((x) => typeof x === "string" && x.trim())
       .slice(0, 8),
     headers: {
-      from: headerAnalysis?.from_address || payload?.sender || "N/A",
-      replyTo: headerAnalysis?.reply_to || payload?.reply_to || "N/A",
-      returnPath: headerAnalysis?.return_path || payload?.return_path || "N/A",
-      spf: spfMeta,
-      dkim: dkimMeta,
-      dmarc: dmarcMeta,
-      domain: alignmentMeta,
-      warnings: headerWarnings,
+      from: payload?.sender || "N/A",
+      replyTo: payload?.reply_to || "N/A",
+      returnPath: payload?.return_path || "N/A",
+      spf: "N/A",
+      dkim: "N/A",
+      dmarc: "N/A",
+      domain: classifyHeaderDomain(headerFlags),
     },
     urls: extractedUrls.map((url) => {
       const key = urlKey(url);
@@ -1474,34 +1390,28 @@ const mapApiResponseToView = (payload) => {
       ].includes(ext);
       return { name, ext, danger };
     }),
-    attachmentFlags,
-    language: {
-      riskScore: languageRiskScore,
-      phishingScore: phishingLanguageScore,
-      indicators: suspiciousIndicators,
-      heuristic: languageAnalysis?.heuristic !== false,
-    },
+    kw: languageFlags,
     stats: {
       links: Number(payload?.url_count || extractedUrls.length || 0),
       html: Boolean(payload?.has_html),
       attach: Number(payload?.attachment_count || attachmentNames.length || 0),
-      phishKw: suspiciousIndicators.length,
+      phishKw: languageFlags.length,
     },
   };
 };
 
 const LandingTicker = () => {
   const items = [
-    "â¬¡ 2.4B THREATS BLOCKED TODAY",
-    "â—ˆ 99.97% DETECTION RATE",
-    "â—† <0.3ms SCAN LATENCY",
-    "â¬¡ 140+ THREAT VECTORS",
-    "â—ˆ SOC2 TYPE II CERTIFIED",
-    "â—† ZERO TRUST ARCHITECTURE",
-    "â¬¡ AI-POWERED ENGINE",
-    "â—ˆ REAL-TIME INTELLIGENCE",
-    "â—† 50M+ EMAILS SCANNED",
-    "â¬¡ ENTERPRISE GRADE",
+    "⬡ 2.4B THREATS BLOCKED TODAY",
+    "◈ 99.97% DETECTION RATE",
+    "◆ <0.3ms SCAN LATENCY",
+    "⬡ 140+ THREAT VECTORS",
+    "◈ SOC2 TYPE II CERTIFIED",
+    "◆ ZERO TRUST ARCHITECTURE",
+    "⬡ AI-POWERED ENGINE",
+    "◈ REAL-TIME INTELLIGENCE",
+    "◆ 50M+ EMAILS SCANNED",
+    "⬡ ENTERPRISE GRADE",
   ];
   const str = items.join("    ");
   return (
@@ -1749,7 +1659,7 @@ const PricingCard = ({
             key={i}
             style={{ display: "flex", alignItems: "center", gap: 10 }}
           >
-            <span style={{ color: "#00FF41", fontSize: 10 }}>â—†</span>
+            <span style={{ color: "#00FF41", fontSize: 10 }}>◆</span>
             <span
               className="f-mono"
               style={{ color: "rgba(200,220,238,.7)", fontSize: 12 }}
@@ -1887,15 +1797,15 @@ const Testimonial = ({ quote, name, role, company, delay = 0 }) => (
           marginTop: 2,
         }}
       >
-        {role} Â· {company}
+        {role} · {company}
       </div>
     </div>
   </div>
 );
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    UNIFIED NAV
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
 const Nav = ({ page, setPage, scrollY }) => {
   const scrolled = scrollY > 60;
   const isApp = page === "app";
@@ -2015,7 +1925,7 @@ const Nav = ({ page, setPage, scrollY }) => {
               (e.currentTarget.style.borderColor = "rgba(0,255,65,.3)")
             }
           >
-            â† BACK TO HOME
+            ← BACK TO HOME
           </button>
         ) : (
           <>
@@ -2107,9 +2017,9 @@ const Nav = ({ page, setPage, scrollY }) => {
   );
 };
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    LANDING PAGE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
 const LandingPage = ({ mx, my, goToApp }) => (
   <div style={{ position: "relative", zIndex: 1 }}>
     {/* Hero */}
@@ -2179,7 +2089,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
           }}
         >
           Sentinel uses military-grade sonar intelligence to scan every email in
-          real-time â€” detecting phishing, malware, spoofing, and zero-day
+          real-time — detecting phishing, malware, spoofing, and zero-day
           exploits before they reach your inbox.
         </motion.p>
         <motion.div
@@ -2265,7 +2175,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
                 style={{ display: "flex", alignItems: "center", gap: 6 }}
               >
                 <span style={{ color: "rgba(0,255,65,.5)", fontSize: 8 }}>
-                  â—†
+                  ◆
                 </span>
                 <span
                   className="f-mono"
@@ -2358,7 +2268,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
             marginBottom: 12,
           }}
         >
-          â—† CAPABILITIES â—†
+          ◆ CAPABILITIES ◆
         </div>
         <h2
           className="f-orb"
@@ -2381,42 +2291,42 @@ const LandingPage = ({ mx, my, goToApp }) => (
       >
         <FeatureCard
           delay={0}
-          icon="â¬¡"
+          icon="⬡"
           color="#00FF41"
           title="SONAR DETECTION"
-          desc="Our proprietary ping-wave algorithm maps your email landscape in real-time, detecting anomalies the instant they appear â€” milliseconds before delivery."
+          desc="Our proprietary ping-wave algorithm maps your email landscape in real-time, detecting anomalies the instant they appear — milliseconds before delivery."
         />
         <FeatureCard
           delay={0.1}
-          icon="â—ˆ"
+          icon="◈"
           color="#00E5FF"
           title="ZERO-DAY DEFENSE"
           desc="AI pattern-matching trained on 50B+ threat samples identifies unknown attack vectors with 99.3% accuracy, even without prior signatures."
         />
         <FeatureCard
           delay={0.2}
-          icon="â—†"
+          icon="◆"
           color="#00FFA3"
           title="LINK DETONATION"
           desc="Every URL is detonated in an isolated sandbox environment. Our crawler follows redirects and analyzes final destinations before you ever click."
         />
         <FeatureCard
           delay={0.3}
-          icon="â–²"
+          icon="▲"
           color="red"
           title="THREAT LOCKDOWN"
           desc="Confirmed threats are quarantined instantly with lock-bracket isolation. Admins receive real-time alerts with full forensic analysis."
         />
         <FeatureCard
           delay={0.4}
-          icon="â—‡"
+          icon="◇"
           color="#00E5FF"
           title="BEHAVIORAL AI"
           desc="Machine learning models analyze sender behavior, timing patterns, and linguistic anomalies to detect impersonation and BEC attacks."
         />
         <FeatureCard
           delay={0.5}
-          icon="â¬¡"
+          icon="⬡"
           color="#00FF41"
           title="CONTINUOUS RADAR"
           desc="24/7 persistent threat monitoring with adaptive sensitivity. The system recalibrates detection thresholds dynamically."
@@ -2447,7 +2357,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
                 marginBottom: 12,
               }}
             >
-              â—† HOW IT WORKS â—†
+              ◆ HOW IT WORKS ◆
             </div>
             <h2
               className="f-orb"
@@ -2469,7 +2379,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
               delay={0.1}
               num="01"
               title="EMAIL INTERCEPTED"
-              desc="Every incoming email is intercepted at the MX layer before delivery. Zero latency impact â€” your users never notice a delay."
+              desc="Every incoming email is intercepted at the MX layer before delivery. Zero latency impact — your users never notice a delay."
             />
             <Step
               delay={0.2}
@@ -2523,7 +2433,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
                 marginBottom: 20,
               }}
             >
-              â—† LIVE ANALYSIS FEED
+              ◆ LIVE ANALYSIS FEED
             </div>
             {[
               {
@@ -2635,7 +2545,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
                   letterSpacing: 2,
                 }}
               >
-                âš  THREAT DETECTED
+                ⚠ THREAT DETECTED
               </span>
             </div>
           </div>
@@ -2690,7 +2600,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
             marginBottom: 16,
           }}
         >
-          â—† START TODAY â—†
+          ◆ START TODAY ◆
         </div>
         <h2
           className="f-orb"
@@ -2938,7 +2848,7 @@ const LandingPage = ({ mx, my, goToApp }) => (
             letterSpacing: 1,
           }}
         >
-          Â© 2026 SENTINEL SECURITY INC. ALL RIGHTS RESERVEresult.
+          © 2026 SENTINEL SECURITY INC. ALL RIGHTS RESERVEresult.
         </span>
         <div style={{ display: "flex", gap: 20 }}>
           {["PRIVACY", "TERMS", "SECURITY"].map((l) => (
@@ -2966,9 +2876,9 @@ const LandingPage = ({ mx, my, goToApp }) => (
   </div>
 );
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    ANALYZER APP PAGE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
 const AnalyzerApp = ({ mx, my }) => {
   const [tab, setTab] = useState("upload");
   const [file, setFile] = useState(null);
@@ -3035,8 +2945,7 @@ const AnalyzerApp = ({ mx, my }) => {
     setAnalysis(EMPTY_ANALYSIS);
   };
   const result = analysis || EMPTY_ANALYSIS;
-  const languageRiskScore = toPercent(result?.language?.riskScore);
-  const phishingLanguageScore = toPercent(result?.language?.phishingScore);
+  const phishScore = Math.min(100, Math.max(0, result.stats.phishKw * 25));
   const DRow = ({ k, v, status }) => (
     <div
       style={{
@@ -3067,11 +2976,7 @@ const AnalyzerApp = ({ mx, my }) => {
               ? "#FF4D6D"
               : status === "warn"
                 ? "#FFD60A"
-                : status === "good"
-                  ? "#00FFA3"
-                  : status === "na"
-                    ? "#8A7EA8"
-                    : "#6899B8",
+                : "#6899B8",
           flex: 1,
           wordBreak: "break-all",
         }}
@@ -3091,27 +2996,17 @@ const AnalyzerApp = ({ mx, my }) => {
                 ? "rgba(255,77,109,.1)"
                 : status === "warn"
                   ? "rgba(255,214,10,.1)"
-                  : status === "good"
-                    ? "rgba(0,255,163,.1)"
-                    : "rgba(138,126,168,.14)",
-            border: `1px solid ${status === "bad" ? "rgba(255,77,109,.3)" : status === "warn" ? "rgba(255,214,10,.3)" : status === "good" ? "rgba(0,255,163,.3)" : "rgba(138,126,168,.32)"}`,
+                  : "rgba(0,255,163,.1)",
+            border: `1px solid ${status === "bad" ? "rgba(255,77,109,.3)" : status === "warn" ? "rgba(255,214,10,.3)" : "rgba(0,255,163,.3)"}`,
             color:
               status === "bad"
                 ? "#FF4D6D"
                 : status === "warn"
                   ? "#FFD60A"
-                  : status === "good"
-                    ? "#00FFA3"
-                    : "#A89BC4",
+                  : "#00FFA3",
           }}
         >
-          {status === "bad"
-            ? "FAIL"
-            : status === "warn"
-              ? "WARN"
-              : status === "good"
-                ? "PASS"
-                : "N/A"}
+          {status === "bad" ? "FAIL" : status === "warn" ? "WARN" : "PASS"}
         </span>
       )}
     </div>
@@ -3146,7 +3041,7 @@ const AnalyzerApp = ({ mx, my }) => {
               marginBottom: 14,
             }}
           >
-            â—† AI-POWERED SECURITY ANALYSIS â—†
+            ◆ AI-POWERED SECURITY ANALYSIS ◆
           </div>
           <h1
             className="f-orb"
@@ -3299,7 +3194,7 @@ const AnalyzerApp = ({ mx, my }) => {
                     letterSpacing: 1,
                   }}
                 >
-                  MAX 25MB Â· .EML .MSG .TXT
+                  MAX 25MB · .EML .MSG .TXT
                 </div>
               </div>
               <div
@@ -3314,8 +3209,8 @@ const AnalyzerApp = ({ mx, my }) => {
                 }}
               >
                 {[
-                  ["upload", "ðŸ“Ž Upload .eml"],
-                  ["paste", "âœï¸ Paste Email"],
+                  ["upload", "📎 Upload .eml"],
+                  ["paste", "✏️ Paste Email"],
                 ].map(([id, lbl]) => (
                   <button
                     key={id}
@@ -3385,7 +3280,7 @@ const AnalyzerApp = ({ mx, my }) => {
                       }}
                     />
                     <div style={{ fontSize: 44, marginBottom: 14 }}>
-                      {file ? "âœ…" : "ðŸ“§"}
+                      {file ? "✅" : "📧"}
                     </div>
                     {file ? (
                       <>
@@ -3402,7 +3297,7 @@ const AnalyzerApp = ({ mx, my }) => {
                             marginTop: 6,
                           }}
                         >
-                          {(file.size / 1024).toFixed(1)} KB Â· Ready for
+                          {(file.size / 1024).toFixed(1)} KB · Ready for
                           analysis
                         </div>
                       </>
@@ -3425,7 +3320,7 @@ const AnalyzerApp = ({ mx, my }) => {
                             marginTop: 8,
                           }}
                         >
-                          or click to browse â€” supports .eml, .msg, .txt
+                          or click to browse — supports .eml, .msg, .txt
                         </div>
                       </>
                     )}
@@ -3456,7 +3351,7 @@ const AnalyzerApp = ({ mx, my }) => {
                         onChange={(e) => setSubj(e.target.value)}
                         onFocus={() => setFocused(true)}
                         onBlur={() => setFocused(false)}
-                        placeholder="Re: Urgent â€” Verify Your Account Immediately"
+                        placeholder="Re: Urgent — Verify Your Account Immediately"
                         className="cyber-input"
                         style={{ padding: "12px 16px" }}
                       />
@@ -3570,7 +3465,7 @@ const AnalyzerApp = ({ mx, my }) => {
                           zIndex: 1,
                         }}
                       >
-                        â¬¡ ANALYZE EMAIL
+                        ⬡ ANALYZE EMAIL
                       </span>
                     </motion.button>
                     {!canScan && (
@@ -3655,7 +3550,7 @@ const AnalyzerApp = ({ mx, my }) => {
                     letterSpacing: 1,
                   }}
                 >
-                  Â· 0.34s
+                  · 0.34s
                 </span>
               </div>
               <button
@@ -3681,7 +3576,7 @@ const AnalyzerApp = ({ mx, my }) => {
                   e.target.style.borderColor = "rgba(0,229,255,.15)";
                 }}
               >
-                â† NEW SCAN
+                ← NEW SCAN
               </button>
             </motion.div>
             <motion.div
@@ -3724,8 +3619,8 @@ const AnalyzerApp = ({ mx, my }) => {
                     delay={0.4}
                   />
                   <BarStat
-                    label="LANGUAGE RISK (HEURISTIC)"
-                    val={languageRiskScore}
+                    label="PHISH SCORE"
+                    val={phishScore}
                     color="#FFD60A"
                     delay={0.5}
                   />
@@ -3784,14 +3679,14 @@ const AnalyzerApp = ({ mx, my }) => {
               }}
             >
               <StatCard
-                icon="ðŸ”—"
+                icon="🔗"
                 label="EXTRACTED LINKS"
                 value={result.stats.links}
                 color="#00E5FF"
                 delay={0.4}
               />
               <StatCard
-                icon="ðŸ“„"
+                icon="📄"
                 label="HTML CONTENT"
                 value={result.stats.html ? "YES" : "NO"}
                 color="#7C3AED"
@@ -3799,15 +3694,15 @@ const AnalyzerApp = ({ mx, my }) => {
                 delay={0.45}
               />
               <StatCard
-                icon="ðŸ“Ž"
+                icon="📎"
                 label="ATTACHMENTS"
                 value={result.stats.attach}
                 color="#FF4D6D"
                 delay={0.5}
               />
               <StatCard
-                icon="âš ï¸"
-                label="LANG SIGNALS"
+                icon="⚠️"
+                label="PHISH KEYWORDS"
                 value={result.stats.phishKw}
                 color="#FFD60A"
                 delay={0.55}
@@ -3830,77 +3725,18 @@ const AnalyzerApp = ({ mx, my }) => {
                 FORENSIC ANALYSIS
               </div>
               <Panel
-                title="HEADER AUTHENTICATION"
-                icon="ðŸ”"
+                title="HEADER ANALYSIS"
+                icon="🔍"
                 color="#00E5FF"
                 delay={0.5}
               >
                 <div style={{ marginTop: 10 }}>
-                  <DRow k="FROM" v={result.headers.from} />
-                  <DRow
-                    k="REPLY-TO"
-                    v={result.headers.replyTo}
-                    status={result.headers.replyTo === "N/A" ? "na" : undefined}
-                  />
-                  <DRow
-                    k="RETURN-PATH"
-                    v={result.headers.returnPath}
-                    status={result.headers.returnPath === "N/A" ? "na" : undefined}
-                  />
-                  <DRow
-                    k="SPF"
-                    v={`${result.headers.spf.label} - ${result.headers.spf.detail}`}
-                    status={result.headers.spf.tone}
-                  />
-                  <DRow
-                    k="DKIM"
-                    v={`${result.headers.dkim.label} - ${result.headers.dkim.detail}`}
-                    status={result.headers.dkim.tone}
-                  />
-                  <DRow
-                    k="DMARC"
-                    v={`${result.headers.dmarc.label} - ${result.headers.dmarc.detail}`}
-                    status={result.headers.dmarc.tone}
-                  />
-                  <DRow
-                    k="DOMAIN CONSISTENCY"
-                    v={`${result.headers.domain.label} - ${result.headers.domain.detail}`}
-                    status={result.headers.domain.tone}
-                  />
-                  {result.headers.warnings.length > 0 && (
-                    <div
-                      style={{
-                        marginTop: 12,
-                        padding: "10px 12px",
-                        borderRadius: 8,
-                        background: "rgba(255,214,10,.06)",
-                        border: "1px solid rgba(255,214,10,.2)",
-                      }}
-                    >
-                      <div
-                        className="f-mono"
-                        style={{
-                          fontSize: 8,
-                          letterSpacing: 1.6,
-                          color: "rgba(255,214,10,.75)",
-                          marginBottom: 8,
-                        }}
-                      >
-                        HEADER WARNINGS
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                        {result.headers.warnings.map((warning) => (
-                          <div
-                            key={warning}
-                            className="f-mono"
-                            style={{ fontSize: 10, color: "rgba(255,214,10,.8)" }}
-                          >
-                            - {warning}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <DRow k="FROM" v={result.headers.from} status="bad" />
+                  <DRow k="REPLY-TO" v={result.headers.replyTo} status="bad" />
+                  <DRow k="SPF" v={result.headers.spf} status="bad" />
+                  <DRow k="DKIM" v={result.headers.dkim} status="bad" />
+                  <DRow k="DMARC" v={result.headers.dmarc} status="bad" />
+                  <DRow k="DOMAIN" v={result.headers.domain} status="warn" />
                 </div>
               </Panel>
               <Panel
@@ -3917,69 +3753,53 @@ const AnalyzerApp = ({ mx, my }) => {
                     gap: 8,
                   }}
                 >
-                  {result.urls.length === 0 ? (
+                  {result.urls.map(({ url, sus, type }, i) => (
                     <div
-                      className="f-mono"
+                      key={i}
                       style={{
-                        fontSize: 11,
-                        color: "rgba(100,140,170,.55)",
-                        padding: "12px 14px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        padding: "10px 14px",
                         borderRadius: 8,
-                        background: "rgba(0,229,255,.03)",
-                        border: "1px solid rgba(0,229,255,.12)",
+                        background: sus
+                          ? "rgba(255,77,109,.04)"
+                          : "rgba(0,255,163,.03)",
+                        border: `1px solid ${sus ? "rgba(255,77,109,.15)" : "rgba(0,255,163,.12)"}`,
                       }}
                     >
-                      No URLs extracted from this email.
-                    </div>
-                  ) : (
-                    result.urls.map(({ url, sus, type }, i) => (
-                      <div
-                        key={i}
+                      <span style={{ fontSize: 12 }}>{sus ? "🔴" : "🟢"}</span>
+                      <span
+                        className="f-mono"
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          padding: "10px 14px",
-                          borderRadius: 8,
-                          background: sus
-                            ? "rgba(255,77,109,.04)"
-                            : "rgba(0,255,163,.03)",
-                          border: `1px solid ${sus ? "rgba(255,77,109,.15)" : "rgba(0,255,163,.12)"}`,
+                          fontSize: 11,
+                          color: sus ? "#FF4D6D" : "#00FFA3",
+                          flex: 1,
+                          wordBreak: "break-all",
                         }}
                       >
-                        <span style={{ fontSize: 12 }}>{sus ? "🔴" : "🟢"}</span>
-                        <span
-                          className="f-mono"
-                          style={{
-                            fontSize: 11,
-                            color: sus ? "#FF4D6D" : "#00FFA3",
-                            flex: 1,
-                            wordBreak: "break-all",
-                          }}
-                        >
-                          {url}
-                        </span>
-                        <span
-                          className="f-mono"
-                          style={{
-                            fontSize: 8,
-                            color: sus
-                              ? "rgba(255,77,109,.6)"
-                              : "rgba(0,255,163,.5)",
-                            background: sus
-                              ? "rgba(255,77,109,.08)"
-                              : "rgba(0,255,163,.06)",
-                            border: `1px solid ${sus ? "rgba(255,77,109,.2)" : "rgba(0,255,163,.15)"}`,
-                            padding: "2px 8px",
-                            borderRadius: 4,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {type}
-                        </span>
-                      </div>
-                    ))
-                  )}
+                        {url}
+                      </span>
+                      <span
+                        className="f-mono"
+                        style={{
+                          fontSize: 8,
+                          color: sus
+                            ? "rgba(255,77,109,.6)"
+                            : "rgba(0,255,163,.5)",
+                          background: sus
+                            ? "rgba(255,77,109,.08)"
+                            : "rgba(0,255,163,.06)",
+                          border: `1px solid ${sus ? "rgba(255,77,109,.2)" : "rgba(0,255,163,.15)"}`,
+                          padding: "2px 8px",
+                          borderRadius: 4,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {type}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </Panel>
               <Panel
@@ -3996,219 +3816,157 @@ const AnalyzerApp = ({ mx, my }) => {
                     gap: 8,
                   }}
                 >
-                  {result.attach.length === 0 ? (
+                  {result.attach.map((a, i) => (
                     <div
-                      className="f-mono"
+                      key={i}
                       style={{
-                        fontSize: 11,
-                        color: "rgba(100,140,170,.6)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
                         padding: "12px 14px",
                         borderRadius: 8,
-                        background: "rgba(0,229,255,.03)",
-                        border: "1px solid rgba(0,229,255,.12)",
+                        background: "rgba(255,77,109,.04)",
+                        border: "1px solid rgba(255,77,109,.16)",
                       }}
                     >
-                      No attachments detected.
-                    </div>
-                  ) : (
-                    result.attach.map((a, i) => (
-                      <div
-                        key={i}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 12,
-                          padding: "12px 14px",
-                          borderRadius: 8,
-                          background: a.danger
-                            ? "rgba(255,77,109,.04)"
-                            : "rgba(0,229,255,.04)",
-                          border: `1px solid ${a.danger ? "rgba(255,77,109,.2)" : "rgba(0,229,255,.18)"}`,
-                        }}
-                      >
-                        <span style={{ fontSize: 17 }}>{a.danger ? "⚠️" : "📎"}</span>
-                        <div style={{ flex: 1 }}>
-                          <div
-                            className="f-mono"
-                            style={{ fontSize: 12, color: a.danger ? "#FF4D6D" : "#00E5FF" }}
-                          >
-                            {a.name}
-                          </div>
-                          <div
-                            className="f-mono"
-                            style={{
-                              fontSize: 9,
-                              color: a.danger
-                                ? "rgba(255,77,109,.65)"
-                                : "rgba(0,229,255,.55)",
-                              marginTop: 3,
-                            }}
-                          >
-                            {a.danger
-                              ? "Risky attachment extension detected."
-                              : "Attachment present with no risky extension signal."}
-                          </div>
+                      <span style={{ fontSize: 18 }}>⚠️</span>
+                      <div style={{ flex: 1 }}>
+                        <div
+                          className="f-mono"
+                          style={{ fontSize: 12, color: "#FF4D6D" }}
+                        >
+                          {a.name}
                         </div>
-                        <span
+                        <div
                           className="f-mono"
                           style={{
                             fontSize: 9,
-                            color: a.danger ? "#FF4D6D" : "#00E5FF",
-                            background: a.danger
-                              ? "rgba(255,77,109,.1)"
-                              : "rgba(0,229,255,.1)",
-                            border: `1px solid ${a.danger ? "rgba(255,77,109,.3)" : "rgba(0,229,255,.32)"}`,
-                            padding: "3px 10px",
-                            borderRadius: 4,
+                            color: "rgba(255,77,109,.45)",
+                            marginTop: 3,
                           }}
                         >
-                          {a.danger ? "RISK" : "OBSERVED"}
-                        </span>
+                          DOUBLE EXTENSION — POTENTIAL EXECUTABLE DISGUISE
+                        </div>
                       </div>
-                    ))
-                  )}
-                  {result.attachmentFlags.length > 0 && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 2 }}>
-                      {result.attachmentFlags.map((flag) => (
-                        <span
-                          key={flag}
-                          className="f-mono"
-                          style={{
-                            fontSize: 10,
-                            color: "rgba(255,214,10,.85)",
-                            background: "rgba(255,214,10,.08)",
-                            border: "1px solid rgba(255,214,10,.24)",
-                            padding: "4px 9px",
-                            borderRadius: 5,
-                          }}
-                        >
-                          {flag}
-                        </span>
-                      ))}
+                      <span
+                        className="f-mono"
+                        style={{
+                          fontSize: 9,
+                          color: "#FF4D6D",
+                          background: "rgba(255,77,109,.1)",
+                          border: "1px solid rgba(255,77,109,.3)",
+                          padding: "3px 10px",
+                          borderRadius: 4,
+                        }}
+                      >
+                        DANGER
+                      </span>
                     </div>
-                  )}
+                  ))}
                 </div>
               </Panel>
               <Panel
-                title="LANGUAGE RISK SIGNALS"
+                title="LANGUAGE SIGNALS"
                 icon="🧠"
                 color="#7C3AED"
                 delay={0.65}
               >
                 <div style={{ marginTop: 14 }}>
                   <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
-                      gap: 10,
-                      marginBottom: 14,
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "12px 14px",
-                        borderRadius: 8,
-                        background: "rgba(124,58,237,.08)",
-                        border: "1px solid rgba(124,58,237,.22)",
-                      }}
-                    >
-                      <div
-                        className="f-mono"
-                        style={{
-                          fontSize: 8,
-                          color: "rgba(155,111,224,.75)",
-                          letterSpacing: 1.8,
-                          marginBottom: 6,
-                        }}
-                      >
-                        LANGUAGE RISK SCORE
-                      </div>
-                      <div className="f-orb" style={{ color: "#B38AF2", fontSize: 24, fontWeight: 700 }}>
-                        {languageRiskScore}%
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        padding: "12px 14px",
-                        borderRadius: 8,
-                        background: "rgba(255,214,10,.07)",
-                        border: "1px solid rgba(255,214,10,.22)",
-                      }}
-                    >
-                      <div
-                        className="f-mono"
-                        style={{
-                          fontSize: 8,
-                          color: "rgba(255,214,10,.78)",
-                          letterSpacing: 1.8,
-                          marginBottom: 6,
-                        }}
-                      >
-                        PHISHING LANGUAGE SCORE
-                      </div>
-                      <div className="f-orb" style={{ color: "#FFD60A", fontSize: 24, fontWeight: 700 }}>
-                        {phishingLanguageScore}%
-                      </div>
-                    </div>
-                  </div>
-                  <div
                     className="f-mono"
                     style={{
                       fontSize: 9,
                       color: "rgba(100,140,170,.4)",
                       letterSpacing: 2,
-                      marginBottom: 10,
+                      marginBottom: 12,
                     }}
                   >
-                    DETECTED SIGNALS
+                    DETECTED PHISHING PATTERNS
                   </div>
-                  {result.language.indicators.length === 0 ? (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {result.kw.map((kw) => (
+                      <span
+                        key={kw}
+                        className="f-mono"
+                        style={{
+                          fontSize: 11,
+                          color: "#9B6FE0",
+                          background: "rgba(124,58,237,.08)",
+                          border: "1px solid rgba(124,58,237,.22)",
+                          padding: "5px 13px",
+                          borderRadius: 6,
+                        }}
+                      >
+                        "{kw}"
+                      </span>
+                    ))}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 18,
+                      padding: "14px 16px",
+                      borderRadius: 8,
+                      background: "rgba(124,58,237,.05)",
+                      border: "1px solid rgba(124,58,237,.14)",
+                    }}
+                  >
                     <div
                       className="f-mono"
                       style={{
-                        fontSize: 11,
-                        color: "rgba(100,140,170,.58)",
-                        padding: "12px 14px",
-                        borderRadius: 8,
-                        background: "rgba(124,58,237,.04)",
-                        border: "1px solid rgba(124,58,237,.14)",
-                      }}
-                    >
-                      No suspicious language indicators detected.
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                      {result.language.indicators.map((indicator) => (
-                        <span
-                          key={indicator}
-                          className="f-mono"
-                          style={{
-                            fontSize: 10,
-                            color: "#B38AF2",
-                            background: "rgba(124,58,237,.08)",
-                            border: "1px solid rgba(124,58,237,.22)",
-                            padding: "5px 10px",
-                            borderRadius: 6,
-                          }}
-                        >
-                          {indicator}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {result.language.heuristic && (
-                    <div
-                      className="f-mono"
-                      style={{
-                        marginTop: 10,
                         fontSize: 9,
-                        color: "rgba(155,111,224,.58)",
-                        letterSpacing: 0.6,
+                        color: "rgba(124,58,237,.6)",
+                        letterSpacing: 2,
+                        marginBottom: 8,
                       }}
                     >
-                      Scores are heuristic and derived from backend language rules.
+                      AI LANGUAGE ENTROPY SCORE
                     </div>
-                  )}
+                    <div
+                      style={{
+                        height: 4,
+                        background: "rgba(255,255,255,.04)",
+                        borderRadius: 99,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: "84%" }}
+                        transition={{
+                          duration: 1.5,
+                          delay: 0.8,
+                          ease: "easeOut",
+                        }}
+                        style={{
+                          height: "100%",
+                          background:
+                            "linear-gradient(90deg,#7C3AED66,#7C3AED)",
+                          borderRadius: 99,
+                          boxShadow: "0 0 10px #7C3AED",
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginTop: 6,
+                      }}
+                    >
+                      <span
+                        className="f-mono"
+                        style={{ fontSize: 8, color: "rgba(124,58,237,.4)" }}
+                      >
+                        LEGITIMATE
+                      </span>
+                      <span
+                        className="f-mono"
+                        style={{ fontSize: 9, color: "#9B6FE0" }}
+                      >
+                        84% MANIPULATIVE
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </Panel>
             </motion.div>
@@ -4264,16 +4022,16 @@ const AnalyzerApp = ({ mx, my }) => {
             letterSpacing: 3,
           }}
         >
-          SENTINEL AI Â· THREAT INTELLIGENCE PLATFORM Â· BUILD 2026.03
+          SENTINEL AI · THREAT INTELLIGENCE PLATFORM · BUILD 2026.03
         </div>
       </motion.footer>
     </div>
   );
 };
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    ROOT APP
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+═══════════════════════════════════════════════════════════════ */
 export default function App() {
   const [page, setPage] = useState("landing");
   const [scrollY, setScrollY] = useState(0);
@@ -4341,5 +4099,3 @@ export default function App() {
     </div>
   );
 }
-
-

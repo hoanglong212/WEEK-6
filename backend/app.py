@@ -198,6 +198,19 @@ TRANSACTIONAL_SYSTEM_PHRASES = (
     "deployment failed",
 )
 
+URGENCY_CUE_KEYWORDS = {"urgent", "immediately", "immediate", "asap", "now", "today", "suspended"}
+CREDENTIAL_HARVESTING_KEYWORDS = {
+    "verify",
+    "verification",
+    "login",
+    "password",
+    "credential",
+    "account",
+    "confirm",
+    "security",
+    "reset",
+}
+
 
 class AnalyzeTextRequest(BaseModel):
     """Request body for manual subject/body analysis."""
@@ -259,15 +272,48 @@ def fallback_subject_body(text: str) -> tuple[str, str]:
     return subject, body
 
 
-def fallback_headers(text: str) -> tuple[str, str, str]:
+def parse_raw_headers_block(text: str) -> dict[str, list[str]]:
+    """Parse raw RFC822 headers from text (including folded multiline headers)."""
+    block = re.split(r"\r?\n\r?\n", text, maxsplit=1)[0]
+    header_map: dict[str, list[str]] = {}
+    current_key = ""
+
+    for line in block.splitlines():
+        if not line.strip():
+            break
+
+        if line[:1] in {" ", "\t"} and current_key:
+            header_map[current_key][-1] = f"{header_map[current_key][-1]} {line.strip()}"
+            continue
+
+        if ":" not in line:
+            current_key = ""
+            continue
+
+        name, value = line.split(":", 1)
+        current_key = name.strip().lower()
+        header_map.setdefault(current_key, []).append(value.strip())
+
+    return header_map
+
+
+def first_header_value(header_map: dict[str, list[str]], key: str) -> str:
+    """Safely read first header value from a parsed header map."""
+    values = header_map.get(key.lower(), [])
+    return str(values[0]).strip() if values else ""
+
+
+def fallback_headers(text: str) -> tuple[str, str, str, list[str], list[str], list[str]]:
     """Fallback header extraction for malformed emails."""
-    from_match = re.search(r"(?im)^from:\s*(.*)$", text)
-    reply_to_match = re.search(r"(?im)^reply-to:\s*(.*)$", text)
-    return_path_match = re.search(r"(?im)^return-path:\s*(.*)$", text)
+    header_map = parse_raw_headers_block(text)
+
     return (
-        from_match.group(1).strip() if from_match else "",
-        reply_to_match.group(1).strip() if reply_to_match else "",
-        return_path_match.group(1).strip() if return_path_match else "",
+        first_header_value(header_map, "from"),
+        first_header_value(header_map, "reply-to"),
+        first_header_value(header_map, "return-path"),
+        [value for value in header_map.get("authentication-results", []) if value],
+        [value for value in header_map.get("received-spf", []) if value],
+        [value for value in header_map.get("dkim-signature", []) if value],
     )
 
 
@@ -301,6 +347,13 @@ def parse_email_payload(raw_bytes: bytes) -> dict[str, Any]:
         sender = str(msg.get("From", "") or "")
         reply_to = str(msg.get("Reply-To", "") or "")
         return_path = str(msg.get("Return-Path", "") or "")
+        authentication_results = [
+            str(value).strip()
+            for value in msg.get_all("Authentication-Results", [])
+            if str(value).strip()
+        ]
+        received_spf = [str(value).strip() for value in msg.get_all("Received-SPF", []) if str(value).strip()]
+        dkim_signatures = [str(value).strip() for value in msg.get_all("DKIM-Signature", []) if str(value).strip()]
 
         has_html = False
         body_chunks: list[str] = []
@@ -363,6 +416,9 @@ def parse_email_payload(raw_bytes: bytes) -> dict[str, Any]:
             "sender": sender,
             "reply_to": reply_to,
             "return_path": return_path,
+            "authentication_results": authentication_results,
+            "received_spf": received_spf,
+            "dkim_signatures": dkim_signatures,
             "has_html": has_html,
             "html_urls": unique_preserve_order(html_urls),
             "attachment_names": attachment_names,
@@ -370,7 +426,9 @@ def parse_email_payload(raw_bytes: bytes) -> dict[str, Any]:
         }
     except Exception:
         subject, body = fallback_subject_body(decoded_text)
-        sender, reply_to, return_path = fallback_headers(decoded_text)
+        sender, reply_to, return_path, authentication_results, received_spf, dkim_signatures = fallback_headers(
+            decoded_text
+        )
         has_html = bool(re.search(r"<html|<body|<table|<div|<a\s+href|<p\b", decoded_text, flags=re.IGNORECASE))
         html_urls = extract_urls_from_html(decoded_text) if has_html else []
         if has_html:
@@ -381,6 +439,9 @@ def parse_email_payload(raw_bytes: bytes) -> dict[str, Any]:
             "sender": sender,
             "reply_to": reply_to,
             "return_path": return_path,
+            "authentication_results": authentication_results,
+            "received_spf": received_spf,
+            "dkim_signatures": dkim_signatures,
             "has_html": has_html,
             "html_urls": unique_preserve_order(html_urls),
             "attachment_names": [],
@@ -457,39 +518,244 @@ def is_official_looking_domain(domain: str) -> bool:
     return False
 
 
-def analyze_headers(sender: str, reply_to: str, return_path: str) -> dict[str, Any]:
-    """Analyze sender/reply headers and return flags + normalized domains."""
+def normalize_auth_status(raw_status: str, protocol: str) -> str:
+    """Normalize auth header status values into stable API enums."""
+    token = (raw_status or "").strip().lower()
+    if not token:
+        return "n/a"
+
+    if protocol == "spf":
+        if token == "pass":
+            return "pass"
+        if token == "softfail":
+            return "softfail"
+        if token == "neutral":
+            return "neutral"
+        if token in {"none", "no"}:
+            return "none"
+        if token in {"fail", "hardfail", "permerror", "temperror", "error"}:
+            return "fail"
+        return "n/a"
+
+    # DKIM / DMARC.
+    if token == "pass":
+        return "pass"
+    if token == "none":
+        return "none"
+    if token in {"fail", "permerror", "temperror", "policy", "reject", "quarantine"}:
+        return "fail"
+    return "n/a"
+
+
+def parse_authentication_results(authentication_results: list[str]) -> dict[str, Any]:
+    """Parse Authentication-Results headers for SPF/DKIM/DMARC and related domains."""
+    spf_status = "n/a"
+    dkim_status = "n/a"
+    dmarc_status = "n/a"
+    auth_domains: list[str] = []
+
+    for value in authentication_results:
+        if spf_status == "n/a":
+            spf_match = re.search(r"\bspf\s*=\s*([a-zA-Z]+)\b", value, flags=re.IGNORECASE)
+            if spf_match:
+                spf_status = normalize_auth_status(spf_match.group(1), "spf")
+
+        if dkim_status == "n/a":
+            dkim_match = re.search(r"\bdkim\s*=\s*([a-zA-Z]+)\b", value, flags=re.IGNORECASE)
+            if dkim_match:
+                dkim_status = normalize_auth_status(dkim_match.group(1), "dkim")
+
+        if dmarc_status == "n/a":
+            dmarc_match = re.search(r"\bdmarc\s*=\s*([a-zA-Z]+)\b", value, flags=re.IGNORECASE)
+            if dmarc_match:
+                dmarc_status = normalize_auth_status(dmarc_match.group(1), "dmarc")
+
+        for pattern in (
+            r"\bheader\.from\s*=\s*([^\s;]+)",
+            r"\bsmtp\.mailfrom\s*=\s*([^\s;]+)",
+            r"\bheader\.i\s*=\s*([^\s;]+)",
+        ):
+            for match in re.finditer(pattern, value, flags=re.IGNORECASE):
+                domain = extract_domain_from_header(match.group(1))
+                if domain:
+                    auth_domains.append(domain)
+
+    return {
+        "spf_status": spf_status,
+        "dkim_status": dkim_status,
+        "dmarc_status": dmarc_status,
+        "auth_domains": unique_preserve_order(auth_domains),
+    }
+
+
+def extract_spf_status_from_received_spf(received_spf_headers: list[str]) -> str:
+    """Parse SPF status from Received-SPF headers."""
+    for value in received_spf_headers:
+        spf_match = re.search(r"\bspf\s*=\s*([a-zA-Z]+)\b", value, flags=re.IGNORECASE)
+        if spf_match:
+            normalized = normalize_auth_status(spf_match.group(1), "spf")
+            if normalized != "n/a":
+                return normalized
+
+        prefix_match = re.match(r"^\s*([a-zA-Z]+)\b", value.strip())
+        if prefix_match:
+            normalized = normalize_auth_status(prefix_match.group(1), "spf")
+            if normalized != "n/a":
+                return normalized
+
+    return "n/a"
+
+
+def extract_domains_from_received_spf(received_spf_headers: list[str]) -> list[str]:
+    """Extract candidate SPF identity domains from Received-SPF header text."""
+    domains: list[str] = []
+    patterns = (
+        r"\bdomain of\s+[^@\s]+@([^\s>;]+)",
+        r"\benvelope-from=([^\s;]+)",
+        r"\bsender(?:\s+identity)?=([^\s;]+)",
+    )
+
+    for value in received_spf_headers:
+        for pattern in patterns:
+            for match in re.finditer(pattern, value, flags=re.IGNORECASE):
+                domain = extract_domain_from_header(match.group(1))
+                if domain:
+                    domains.append(domain)
+
+    return unique_preserve_order(domains)
+
+
+def extract_dkim_signature_domains(dkim_signatures: list[str]) -> list[str]:
+    """Extract DKIM d= domains from DKIM-Signature headers."""
+    domains: list[str] = []
+    for value in dkim_signatures:
+        match = re.search(r"\bd\s*=\s*([^;\s]+)", value, flags=re.IGNORECASE)
+        if not match:
+            continue
+        domain = extract_domain_from_header(match.group(1))
+        if domain:
+            domains.append(domain)
+    return unique_preserve_order(domains)
+
+
+def compute_domain_alignment(from_domain: str, candidate_domains: list[str]) -> str:
+    """Compute domain alignment between From domain and authenticated domains."""
+    if not from_domain or not candidate_domains:
+        return "unknown"
+    if any(domains_related(from_domain, candidate) for candidate in candidate_domains):
+        return "aligned"
+    return "mismatched"
+
+
+def extract_header_auth_status(
+    *,
+    authentication_results: list[str],
+    received_spf_headers: list[str],
+    dkim_signatures: list[str],
+) -> dict[str, Any]:
+    """Resolve SPF/DKIM/DMARC status using header sources with precedence."""
+    parsed = parse_authentication_results(authentication_results)
+
+    spf_status = parsed["spf_status"]
+    if spf_status == "n/a":
+        spf_status = extract_spf_status_from_received_spf(received_spf_headers)
+
+    dkim_status = parsed["dkim_status"]
+    if dkim_status == "n/a" and not dkim_signatures:
+        dkim_status = "none"
+
+    dmarc_status = parsed["dmarc_status"]
+
+    auth_domains = unique_preserve_order(
+        parsed["auth_domains"]
+        + extract_domains_from_received_spf(received_spf_headers)
+        + extract_dkim_signature_domains(dkim_signatures)
+    )
+
+    return {
+        "spf_status": spf_status,
+        "dkim_status": dkim_status,
+        "dmarc_status": dmarc_status,
+        "auth_domains": auth_domains,
+    }
+
+
+def analyze_headers(
+    sender: str,
+    reply_to: str,
+    return_path: str,
+    *,
+    authentication_results: list[str] | None = None,
+    received_spf_headers: list[str] | None = None,
+    dkim_signatures: list[str] | None = None,
+) -> dict[str, Any]:
+    """Analyze sender/reply headers and authentication signals."""
+    authentication_results = authentication_results or []
+    received_spf_headers = received_spf_headers or []
+    dkim_signatures = dkim_signatures or []
+
     from_domain = extract_domain_from_header(sender)
     reply_domain = extract_domain_from_header(reply_to)
     return_domain = extract_domain_from_header(return_path)
     header_context_present = bool((sender or "").strip() or (reply_to or "").strip() or (return_path or "").strip())
 
-    flags: list[str] = []
+    header_warnings: list[str] = []
     if header_context_present and not from_domain:
-        flags.append("Missing sender domain.")
+        header_warnings.append("Missing sender domain.")
 
     reply_mismatch = bool(from_domain and reply_domain and not domains_related(reply_domain, from_domain))
     return_path_mismatch = bool(from_domain and return_domain and not domains_related(return_domain, from_domain))
 
     if reply_mismatch:
-        flags.append("Reply-To domain differs from sender domain.")
+        header_warnings.append("Reply-To domain differs from sender domain.")
 
     if return_path_mismatch:
-        flags.append("Return-Path domain differs from sender domain.")
+        header_warnings.append("Return-Path domain differs from sender domain.")
+
+    auth_status = extract_header_auth_status(
+        authentication_results=authentication_results,
+        received_spf_headers=received_spf_headers,
+        dkim_signatures=dkim_signatures,
+    )
+    auth_domains = auth_status["auth_domains"]
+    if auth_status["spf_status"] != "n/a" and return_domain:
+        auth_domains = unique_preserve_order(auth_domains + [return_domain])
+
+    domain_alignment = compute_domain_alignment(from_domain, auth_domains)
+    if domain_alignment == "mismatched":
+        header_warnings.append("Authenticated domain is mismatched with From domain.")
+
+    if auth_status["spf_status"] == "fail":
+        header_warnings.append("SPF authentication failed.")
+    elif auth_status["spf_status"] == "softfail":
+        header_warnings.append("SPF authentication returned softfail.")
+
+    if auth_status["dkim_status"] == "fail":
+        header_warnings.append("DKIM authentication failed.")
+
+    if auth_status["dmarc_status"] == "fail":
+        header_warnings.append("DMARC authentication failed.")
 
     academic = bool(from_domain and is_academic_domain(from_domain))
     official = bool(from_domain and is_official_looking_domain(from_domain))
 
+    informational_flags: list[str] = []
     if official:
-        flags.append("Trusted sender domain pattern detected.")
+        informational_flags.append("Trusted sender domain pattern detected.")
     if academic:
-        flags.append("Academic domain detected.")
+        informational_flags.append("Academic domain detected.")
 
     return {
         "from_domain": from_domain,
         "reply_domain": reply_domain,
         "return_domain": return_domain,
-        "header_flags": unique_preserve_order(flags),
+        "spf_status": auth_status["spf_status"],
+        "dkim_status": auth_status["dkim_status"],
+        "dmarc_status": auth_status["dmarc_status"],
+        "domain_alignment": domain_alignment,
+        "auth_domains": auth_domains,
+        "header_warnings": unique_preserve_order(header_warnings),
+        "header_flags": unique_preserve_order(header_warnings + informational_flags),
         "is_academic": academic,
         "is_official": official,
         "reply_mismatch": reply_mismatch,
@@ -748,8 +1014,39 @@ def analyze_attachments(attachment_names: list[str], attachment_extensions: list
     }
 
 
+def compute_language_risk(
+    *,
+    phishing_hits: list[str],
+    urgency_hits: list[str],
+    credential_hits: list[str],
+    marketing_hits: list[str],
+    has_transactional: bool,
+) -> dict[str, int]:
+    """Compute transparent heuristic language risk metrics from detected language rules."""
+    phishing_score = 0.0
+    phishing_score += min(50.0, len(phishing_hits) * 14.0)
+    phishing_score += min(22.0, len(urgency_hits) * 8.0)
+    phishing_score += min(22.0, len(credential_hits) * 8.0)
+
+    language_risk = phishing_score
+    if has_transactional and len(phishing_hits) <= 1:
+        language_risk -= 12.0
+    elif has_transactional:
+        language_risk -= 6.0
+
+    if marketing_hits and len(phishing_hits) <= 1 and not urgency_hits and not credential_hits:
+        language_risk -= 8.0
+    elif marketing_hits and len(phishing_hits) <= 2:
+        language_risk -= 3.0
+
+    return {
+        "language_risk_score": int(round(clamp(language_risk, 0.0, 100.0))),
+        "phishing_language_score": int(round(clamp(phishing_score, 0.0, 100.0))),
+    }
+
+
 def analyze_language(cleaned_text: str) -> dict[str, Any]:
-    """Run lightweight phishing/marketing keyword analysis."""
+    """Run rule-based language signal analysis and return transparent heuristic scores."""
     tokens = set(cleaned_text.split())
     phishing_hits = sorted([keyword for keyword in PHISHING_KEYWORDS if keyword in tokens])
     marketing_hits = sorted([keyword for keyword in MARKETING_KEYWORDS if keyword in tokens])
@@ -758,29 +1055,51 @@ def analyze_language(cleaned_text: str) -> dict[str, Any]:
     transactional_hits = unique_preserve_order(transactional_phrase_hits + transactional_keyword_hits)
     has_transactional = bool(transactional_phrase_hits) or len(transactional_keyword_hits) >= 2
 
-    # Avoid over-penalizing common words like "account" in legitimate transactional emails.
-    has_phishing = len(phishing_hits) >= 2
+    urgency_hits = sorted([keyword for keyword in URGENCY_CUE_KEYWORDS if keyword in tokens])
+    credential_hits = sorted([keyword for keyword in CREDENTIAL_HARVESTING_KEYWORDS if keyword in tokens])
 
-    flags: list[str] = []
+    # Avoid over-penalizing common words like "account" in legitimate transactional emails.
+    has_phishing = len(phishing_hits) >= 2 or (bool(urgency_hits) and bool(credential_hits) and bool(phishing_hits))
+
+    indicators: list[str] = []
     if has_phishing:
-        flags.append("Phishing-like language detected.")
+        indicators.append("Phishing-like language detected.")
     elif phishing_hits:
-        flags.append("Low-confidence phishing terms detected.")
+        indicators.append("Low-confidence phishing terms detected.")
     else:
-        flags.append("No strong phishing keywords detected.")
+        indicators.append("No strong phishing keywords detected.")
+
+    if urgency_hits:
+        indicators.append("Urgency cues detected.")
+    if credential_hits:
+        indicators.append("Credential harvesting cues detected.")
     if marketing_hits:
-        flags.append("Marketing/promotional language detected.")
+        indicators.append("Promotional language detected.")
     if has_transactional:
-        flags.append("Transactional/system notification pattern detected.")
+        indicators.append("Transactional/system notification pattern detected.")
+
+    scores = compute_language_risk(
+        phishing_hits=phishing_hits,
+        urgency_hits=urgency_hits,
+        credential_hits=credential_hits,
+        marketing_hits=marketing_hits,
+        has_transactional=has_transactional,
+    )
+    suspicious_indicators = [item for item in indicators if not item.startswith("No strong phishing")]
 
     return {
         "phishing_hits": phishing_hits,
         "marketing_hits": marketing_hits,
         "transactional_hits": transactional_hits,
+        "urgency_hits": urgency_hits,
+        "credential_hits": credential_hits,
         "has_phishing": has_phishing,
         "has_marketing": bool(marketing_hits),
         "has_transactional": has_transactional,
-        "language_flags": unique_preserve_order(flags),
+        "language_risk_score": scores["language_risk_score"],
+        "phishing_language_score": scores["phishing_language_score"],
+        "suspicious_indicators": suspicious_indicators,
+        "language_flags": unique_preserve_order(indicators),
     }
 
 
@@ -834,6 +1153,27 @@ def compute_risk_score(
         score += 3.0
     if header_analysis["header_context_present"] and header_analysis["missing_sender_domain"]:
         score += 6.0
+    if header_analysis["spf_status"] == "fail":
+        score += 4.0
+    elif header_analysis["spf_status"] == "softfail":
+        score += 2.0
+    elif header_analysis["spf_status"] == "pass":
+        score -= 1.0
+
+    if header_analysis["dkim_status"] == "fail":
+        score += 4.0
+    elif header_analysis["dkim_status"] == "pass":
+        score -= 1.0
+
+    if header_analysis["dmarc_status"] == "fail":
+        score += 6.0
+    elif header_analysis["dmarc_status"] == "pass":
+        score -= 2.0
+
+    if header_analysis["domain_alignment"] == "mismatched":
+        score += 4.0
+    elif header_analysis["domain_alignment"] == "aligned":
+        score -= 1.5
 
     suspicious_url_count = len(url_analysis["suspicious_urls"])
     if suspicious_url_count:
@@ -978,6 +1318,9 @@ def analyze_content(
     return_path: str,
     has_html: bool,
     html_urls: list[str] | None,
+    authentication_results: list[str] | None,
+    received_spf_headers: list[str] | None,
+    dkim_signatures: list[str] | None,
     attachment_names: list[str],
     attachment_extensions: list[str],
 ) -> dict[str, Any]:
@@ -997,7 +1340,14 @@ def analyze_content(
     features = vectorizer.transform([cleaned_text])
     spam_probability = float(classifier.predict_proba(features)[0][1])
 
-    header_analysis = analyze_headers(sender, reply_to, return_path)
+    header_analysis = analyze_headers(
+        sender,
+        reply_to,
+        return_path,
+        authentication_results=authentication_results,
+        received_spf_headers=received_spf_headers,
+        dkim_signatures=dkim_signatures,
+    )
     supplemental_urls = html_urls or []
     if has_html and not supplemental_urls:
         supplemental_urls = extract_urls_from_html(combined_text)
@@ -1044,15 +1394,64 @@ def analyze_content(
         ),
         trusted_or_academic_sender=bool(header_analysis["is_official"] or header_analysis["is_academic"]),
     )
+    indicators = unique_preserve_order(
+        [
+            (
+                "Header authentication summary: "
+                f"SPF={header_analysis['spf_status'].upper()}, "
+                f"DKIM={header_analysis['dkim_status'].upper()}, "
+                f"DMARC={header_analysis['dmarc_status'].upper()}, "
+                f"ALIGNMENT={header_analysis['domain_alignment'].upper()}."
+            ),
+            *indicators,
+        ]
+    )
 
     preview = clean_preview_text(combined_text, max_length=400)
+    normalized_sender = sender.strip() or "N/A"
+    normalized_reply_to = reply_to.strip() or "N/A"
+    normalized_return_path = return_path.strip() or "N/A"
+
+    header_analysis_payload = {
+        "from_address": normalized_sender,
+        "reply_to": normalized_reply_to,
+        "return_path": normalized_return_path,
+        "spf_status": header_analysis["spf_status"],
+        "dkim_status": header_analysis["dkim_status"],
+        "dmarc_status": header_analysis["dmarc_status"],
+        "domain_alignment": header_analysis["domain_alignment"],
+        "header_warnings": header_analysis["header_warnings"],
+        "from_domain": header_analysis["from_domain"] or "n/a",
+        "reply_to_domain": header_analysis["reply_domain"] or "n/a",
+        "return_path_domain": header_analysis["return_domain"] or "n/a",
+    }
+    language_analysis_payload = {
+        "language_risk_score": language_analysis["language_risk_score"],
+        "phishing_language_score": language_analysis["phishing_language_score"],
+        "suspicious_indicators": language_analysis["suspicious_indicators"],
+        "phishing_hits": language_analysis["phishing_hits"],
+        "marketing_hits": language_analysis["marketing_hits"],
+        "transactional_hits": language_analysis["transactional_hits"],
+        "urgency_hits": language_analysis["urgency_hits"],
+        "credential_hits": language_analysis["credential_hits"],
+        "heuristic": True,
+    }
+    attachment_analysis_payload = {
+        "attachment_count": attachment_analysis["attachment_count"],
+        "attachment_names": attachment_analysis["attachment_names"],
+        "attachment_extensions": attachment_analysis["attachment_extensions"],
+        "attachment_flags": attachment_analysis["attachment_flags"],
+        "has_risky_exec": attachment_analysis["has_risky_exec"],
+        "has_compressed": attachment_analysis["has_compressed"],
+        "has_macro": attachment_analysis["has_macro"],
+    }
 
     return {
         "filename": filename,
         "subject": subject or "(no subject)",
-        "sender": sender,
-        "reply_to": reply_to,
-        "return_path": return_path,
+        "sender": normalized_sender,
+        "reply_to": normalized_reply_to,
+        "return_path": normalized_return_path,
         "verdict": verdict,
         "confidence": round(confidence, 6),
         "threshold": round(threshold, 6),
@@ -1067,11 +1466,21 @@ def analyze_content(
         "attachment_count": attachment_analysis["attachment_count"],
         "attachment_names": attachment_analysis["attachment_names"],
         "attachment_extensions": attachment_analysis["attachment_extensions"],
+        "spf_status": header_analysis["spf_status"],
+        "dkim_status": header_analysis["dkim_status"],
+        "dmarc_status": header_analysis["dmarc_status"],
+        "domain_alignment": header_analysis["domain_alignment"],
         "header_flags": header_analysis["header_flags"],
+        "header_warnings": header_analysis["header_warnings"],
         "url_flags": url_analysis["url_flags"],
         "html_flags": html_analysis["html_flags"],
         "attachment_flags": attachment_analysis["attachment_flags"],
         "language_flags": language_analysis["language_flags"],
+        "language_risk_score": language_analysis["language_risk_score"],
+        "phishing_language_score": language_analysis["phishing_language_score"],
+        "header_analysis": header_analysis_payload,
+        "language_analysis": language_analysis_payload,
+        "attachment_analysis": attachment_analysis_payload,
         "indicators": indicators,
         "preview": preview,
     }
@@ -1151,6 +1560,9 @@ async def analyze_email(file: UploadFile = File(...)) -> dict[str, Any]:
             return_path=parsed["return_path"],
             has_html=parsed["has_html"],
             html_urls=parsed["html_urls"],
+            authentication_results=parsed["authentication_results"],
+            received_spf_headers=parsed["received_spf"],
+            dkim_signatures=parsed["dkim_signatures"],
             attachment_names=parsed["attachment_names"],
             attachment_extensions=parsed["attachment_extensions"],
         )
@@ -1181,6 +1593,9 @@ async def analyze_text(payload: AnalyzeTextRequest) -> dict[str, Any]:
             return_path="",
             has_html=has_html,
             html_urls=extract_urls_from_html(combined_text) if has_html else [],
+            authentication_results=[],
+            received_spf_headers=[],
+            dkim_signatures=[],
             attachment_names=[],
             attachment_extensions=[],
         )
